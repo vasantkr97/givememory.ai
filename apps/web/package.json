@@ -1,0 +1,37 @@
+{
+  "name": "@givememory/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun ../../node_modules/vite/bin/vite.js --host 0.0.0.0",
+    "build": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json && bun ../../node_modules/vite/bin/vite.js build",
+    "typecheck": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+    "preview": "bun ../../node_modules/vite/bin/vite.js preview"
+  },
+  "dependencies": {
+    "@givememory/shared": "workspace:*",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "d3": "^7.9.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sonner": "^1.7.2",
+    "swr": "^2.2.5",
+    "tailwind-merge": "^2.6.0",
+    "vite": "^6.0.6"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@givememory/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/apps/api/src/server.js",
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "clean": "bun -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
+    "build": "bun run clean && bun ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "typecheck": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+    "start": "bun dist/apps/api/src/server.js"
+  },
+  "dependencies": {
+    "@givememory/core": "workspace:*",
+    "@givememory/db": "workspace:*",
+    "@givememory/shared": "workspace:*",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@givememory/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "typecheck": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+    "generate": "bun ../../node_modules/prisma/build/index.js generate --schema prisma/schema.prisma",
+    "migrate": "bun ../../node_modules/prisma/build/index.js migrate dev --schema prisma/schema.prisma",
+    "studio": "bun ../../node_modules/prisma/build/index.js studio --schema prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@givememory/shared": "workspace:*",
+    "@prisma/client": "^6.1.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.1.0",
+    "typescript": "^5.7.3"
+  }
+}

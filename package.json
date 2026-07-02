@@ -1,0 +1,28 @@
+{
+  "name": "givememory",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter \"@givememory/api\" dev & bun run --filter \"@givememory/web\" dev",
+    "dev:api": "bun --watch apps/api/src/server.ts",
+    "dev:web": "bun run --filter \"@givememory/web\" dev",
+    "start": "bun run --filter \"@givememory/api\" start",
+    "build": "bun run --filter \"@givememory/shared\" build && bun run --filter \"@givememory/db\" generate && bun run --filter \"@givememory/db\" build && bun run --filter \"@givememory/core\" build && bun run --filter \"@givememory/api\" build && bun run --filter \"@givememory/web\" build",
+    "typecheck": "bun run --filter \"@givememory/shared\" typecheck && bun run --filter \"@givememory/db\" typecheck && bun run --filter \"@givememory/core\" typecheck && bun run --filter \"@givememory/api\" typecheck && bun run --filter \"@givememory/web\" typecheck",
+    "prod:check": "bun run typecheck && bun run db:generate && bun node_modules/prisma/build/index.js validate --schema packages/db/prisma/schema.prisma && bun run build",
+    "db:generate": "bun node_modules/prisma/build/index.js generate --schema packages/db/prisma/schema.prisma",
+    "db:migrate": "bun node_modules/prisma/build/index.js migrate dev --schema packages/db/prisma/schema.prisma",
+    "db:deploy": "bun node_modules/prisma/build/index.js migrate deploy --schema packages/db/prisma/schema.prisma",
+    "db:status": "bun node_modules/prisma/build/index.js migrate status --schema packages/db/prisma/schema.prisma",
+    "db:studio": "bun node_modules/prisma/build/index.js studio --schema packages/db/prisma/schema.prisma",
+    "chat": "bun apps/api/src/cli.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
