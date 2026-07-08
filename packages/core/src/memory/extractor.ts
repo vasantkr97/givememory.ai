@@ -11,12 +11,20 @@ export class MemoryExtractor {
     summaryText: string;
     recentMessages: string[];
   }): Promise<ExtractionResult> {
+    const summarySection = input.summaryText
+      ? `Conversation Summary:\n${input.summaryText}\n\n`
+      : "";
+
+    const recentMessagesSection = input.recentMessages.length > 0
+      ? `Recent Messages:\n${input.recentMessages.join("\n")}\n\n`
+      : "";
+
     const raw = await this.llmClient.chat(
       [
         { role: "system", content: EXTRACTION_SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Latest Interaction:
+          content: `${summarySection}${recentMessagesSection}Latest Interaction:
 ${input.latestPair.join("\n")}
 
 Extract memory facts only from the Latest Interaction above.`
