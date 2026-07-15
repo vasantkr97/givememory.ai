@@ -21,10 +21,10 @@
   },
   "dependencies": {
     "@givememory/shared": "workspace:*",
-    "@prisma/client": "^6.1.0"
+    "@prisma/client": "6.19.3"
   },
   "devDependencies": {
-    "prisma": "^6.1.0",
+    "prisma": "6.19.3",
     "typescript": "^5.7.3"
   }
 }

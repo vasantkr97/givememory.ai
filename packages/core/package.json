@@ -19,7 +19,7 @@
   "dependencies": {
     "@givememory/db": "workspace:*",
     "@givememory/shared": "workspace:*",
-    "@prisma/client": "^6.1.0",
+    "@prisma/client": "6.19.3",
     "openai": "^4.77.0"
   },
   "devDependencies": {

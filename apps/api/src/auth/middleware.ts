@@ -27,6 +27,7 @@ export function toPublicUser(user: AuthUser, hasApiKey: boolean) {
     id: user.id,
     name: user.name,
     email: user.email,
+    is_admin: isAdminEmail(user.email),
     is_active: true,
     created_at: user.createdAt.toISOString(),
     usage: {

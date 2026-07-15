@@ -31,7 +31,7 @@ export class ConnectionFinder {
       metadata: setConnectionIds(newBubble, connectionIds, connectionScores)
     });
 
-    const connectedMemories = await this.memoryStore.findManyByIds(connectionIds);
+    const connectedMemories = await this.memoryStore.findManyByIds(connectionIds, conversationId);
     for (const memory of connectedMemories) {
       const existingIds = getConnectionIds(memory);
       if (existingIds.includes(newBubble.id)) {

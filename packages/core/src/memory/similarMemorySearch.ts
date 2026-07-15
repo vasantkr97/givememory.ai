@@ -14,7 +14,10 @@ export class SimilarMemorySearch {
       return [];
     }
 
-    const memories = await this.memoryStore.findManyByIds(results.map((result) => result.memoryId));
+    const memories = await this.memoryStore.findManyByIds(
+      results.map((result) => result.memoryId),
+      conversationId
+    );
     const byId = new Map(memories.map((memory) => [memory.id, memory]));
 
     return results.map((result) => byId.get(result.memoryId)).filter((memory): memory is Memory => Boolean(memory));

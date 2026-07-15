@@ -48,7 +48,7 @@ function SignUpContent() {
           </div>
           <h1 className="text-2xl font-bold">Create an account</h1>
           <p className="text-muted-foreground">
-            Get started with ContextMemory
+            Get started with GiveMemory.ai
           </p>
         </div>
 

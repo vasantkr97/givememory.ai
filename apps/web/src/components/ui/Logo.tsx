@@ -20,7 +20,7 @@ export function Logo({ size = 48, showText = true }: LogoProps) {
         {/* The logo with blend mode to remove background */}
         <Image
           src="/contextmemorylogo.png"
-          alt="ContextMemory Logo"
+          alt="GiveMemory.ai logo"
           width={size}
           height={size}
           className="object-contain mix-blend-multiply dark:mix-blend-screen dark:invert"
@@ -33,7 +33,7 @@ export function Logo({ size = 48, showText = true }: LogoProps) {
 
       {showText && (
         <span className="text-xl font-semibold text-foreground tracking-tight group-hover:text-foreground/90 transition-colors">
-          ContextMemory
+          GiveMemory.ai
         </span>
       )}
     </Link>

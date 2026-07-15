@@ -48,7 +48,7 @@ function SignInContent() {
           </div>
           <h1 className="text-2xl font-bold">Welcome back</h1>
           <p className="text-muted-foreground">
-            Sign in to your ContextMemory account
+            Sign in to your GiveMemory.ai account
           </p>
         </div>
 

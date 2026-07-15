@@ -10,8 +10,27 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  is_admin?: boolean;
   is_active: boolean;
   usage: UsageInfo;
+}
+
+export interface ProviderSettings {
+  llmProvider: "openai" | "openrouter";
+  hasOpenaiApiKey: boolean;
+  hasOpenrouterApiKey: boolean;
+  llmModel: string;
+  embeddingModel: string;
+  debug: boolean;
+}
+
+export interface ProviderSettingsUpdate {
+  llmProvider: "openai" | "openrouter";
+  openaiApiKey?: string | null;
+  openrouterApiKey?: string | null;
+  llmModel: string;
+  embeddingModel: string;
+  debug: boolean;
 }
 
 export interface SignUpRequest {

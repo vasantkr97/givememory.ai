@@ -68,10 +68,11 @@ export class MemoryStore {
     });
   }
 
-  findManyByIds(ids: number[]) {
+  findManyByIds(ids: number[], conversationId?: number) {
     return this.db.memory.findMany({
       where: {
         id: { in: ids },
+        ...(conversationId === undefined ? {} : { conversationId }),
         isActive: true
       }
     });

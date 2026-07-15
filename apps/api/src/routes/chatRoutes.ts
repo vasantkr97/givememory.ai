@@ -15,25 +15,24 @@ chatRoutes.post(
   asyncHandler(async (request, response) => {
     const input = productChatSchema.parse(request.body);
     const user = request.user!;
-    const conversationId = user.id;
-
-    await prisma.conversation.upsert({
-      where: { id: conversationId },
-      create: { id: conversationId, userId: user.id },
-      update: { userId: user.id }
-    });
+    const conversation = await appServices.stores.conversationStore.getOrCreateForUser(user.id);
+    const conversationId = conversation.id;
 
     const settings = await appServices.stores.providerSettingsStore.get();
-    const systemApiKey = firstConfiguredApiKey(process.env.OPENROUTER_API_KEY, settings.openrouterApiKey);
+    const provider = request.effectiveApiKey ? "openrouter" : settings.llmProvider;
+    const systemApiKey = provider === "openrouter"
+      ? firstConfiguredApiKey(settings.openrouterApiKey, process.env.OPENROUTER_API_KEY)
+      : firstConfiguredApiKey(settings.openaiApiKey, process.env.OPENAI_API_KEY);
     const effectiveApiKey = request.effectiveApiKey ?? systemApiKey;
     if (!effectiveApiKey) {
-      response.status(503).json({ detail: "System API key not configured. Please add OPENROUTER_API_KEY." });
+      const variableName = provider === "openrouter" ? "OPENROUTER_API_KEY" : "OPENAI_API_KEY";
+      response.status(503).json({ detail: `System API key not configured. Please add ${variableName}.` });
       return;
     }
 
     const result = await runWithLlmOverride(
       {
-        provider: "openrouter",
+        provider,
         apiKey: effectiveApiKey,
         llmModel: settings.llmModel,
         embeddingModel: settings.embeddingModel

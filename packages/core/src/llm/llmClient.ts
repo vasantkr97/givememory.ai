@@ -24,9 +24,10 @@ export class LlmClient {
     const provider = override?.provider ?? settings.llmProvider;
     const apiKey = override?.apiKey ?? (settings.llmProvider === "openrouter" ? settings.openrouterApiKey : settings.openaiApiKey);
     const client = this.createClient(apiKey, provider);
+    const configuredModel = override?.llmModel ?? settings.llmModel;
 
     const response = await client.chat.completions.create({
-      model: override?.llmModel ?? settings.llmModel,
+      model: normalizeModel(provider, configuredModel),
       messages,
       temperature: options?.temperature ?? 0
     });
@@ -41,13 +42,9 @@ export class LlmClient {
     const apiKey = override?.apiKey ?? (settings.llmProvider === "openrouter" ? settings.openrouterApiKey : settings.openaiApiKey);
     const client = this.createClient(apiKey, provider);
     const configuredEmbeddingModel = override?.embeddingModel ?? settings.embeddingModel;
-    const model =
-      provider === "openrouter" && !configuredEmbeddingModel.startsWith("openai/")
-        ? `openai/${configuredEmbeddingModel}`
-        : configuredEmbeddingModel;
 
     const response = await client.embeddings.create({
-      model,
+      model: normalizeModel(provider, configuredEmbeddingModel),
       input: text
     });
 
@@ -72,4 +69,12 @@ export class LlmClient {
 
     return new OpenAI({ apiKey });
   }
+}
+
+function normalizeModel(provider: "openai" | "openrouter", model: string) {
+  if (provider === "openrouter" && !model.includes("/")) {
+    return `openai/${model}`;
+  }
+
+  return model;
 }

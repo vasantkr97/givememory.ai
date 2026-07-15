@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "@givememory/db";
 import { refreshTokenSchema, signInSchema, signUpSchema } from "@givememory/shared";
 import { asyncHandler } from "../middleware/asyncHandler";
+import { appServices } from "../services";
 import { authenticate, getUserApiKey, toPublicUser } from "../auth/middleware";
 import {
   ACCESS_TOKEN_EXPIRE_SECONDS,
@@ -45,18 +46,20 @@ authRoutes.post(
       return;
     }
 
-    const user = await prisma.user.create({
-      data: {
-        name: input.name,
-        email: input.email.toLowerCase(),
-        hashedPassword: hashPassword(input.password)
-      }
-    });
+    const user = await prisma.$transaction(async (transaction) => {
+      const createdUser = await transaction.user.create({
+        data: {
+          name: input.name,
+          email: input.email.toLowerCase(),
+          hashedPassword: hashPassword(input.password)
+        }
+      });
 
-    await prisma.conversation.upsert({
-      where: { id: user.id },
-      create: { id: user.id, userId: user.id },
-      update: { userId: user.id }
+      await transaction.conversation.create({
+        data: { userId: createdUser.id }
+      });
+
+      return createdUser;
     });
 
     response.json(await issueAuthResponse(user));
@@ -73,11 +76,7 @@ authRoutes.post(
       return;
     }
 
-    await prisma.conversation.upsert({
-      where: { id: user.id },
-      create: { id: user.id, userId: user.id },
-      update: { userId: user.id }
-    });
+    await appServices.stores.conversationStore.getOrCreateForUser(user.id);
 
     response.json(await issueAuthResponse(user));
   })

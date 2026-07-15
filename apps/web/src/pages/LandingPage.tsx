@@ -440,7 +440,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-6">
               <a
-                href="https://x.com/contextmemory"
+                href="https://x.com/vasantkr97"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"

@@ -94,7 +94,7 @@ bun run db:generate
 bun run db:migrate
 ```
 
-If `db:migrate` has trouble with Neon shadow database permissions, use:
+For a disposable local or preview database only, if `db:migrate` has trouble with Neon shadow database permissions, use:
 
 ```bash
 bunx prisma db push --schema packages/db/prisma/schema.prisma
@@ -106,6 +106,20 @@ For production, use checked-in migrations instead of development migrations:
 bun run db:deploy
 bun run db:status
 ```
+
+### Fresh Neon database for production
+
+Do not reuse a development database that contains old demo users or memories. Create a new Neon project/database. A normal branch of the existing project copies its parent data, so it is not clean unless it branches from a point before those rows existed.
+
+After creating the new project:
+
+1. Copy its connection string into `DATABASE_URL` in `.env` and in the deployed API environment.
+2. Enable pgvector in the new database with `CREATE EXTENSION IF NOT EXISTS vector;`.
+3. Apply the checked-in migration history with `bun run db:deploy`.
+4. Confirm the result with `bun run db:status`.
+5. Start the API and create a new account through the product. Do not copy the old `users`, `conversations`, `chat_messages`, `messages`, or `memories` rows.
+
+Keep the old database temporarily as a rollback archive, but do not point the production API at it.
 
 ## Run The App
 
@@ -166,7 +180,7 @@ User OpenRouter API keys are encrypted before storage and are never returned to 
 3. Send:
 
 ```txt
-Hi, I am Samiksha. I love Python and prefer dark mode.
+Hi, I am Alex. I use TypeScript and prefer dark mode.
 ```
 
 Expected:
@@ -175,20 +189,20 @@ Expected:
 - The graph refreshes with semantic memories like:
 
 ```txt
-User name is Samiksha
-User loves Python
+User name is Alex
+User uses TypeScript
 User prefers dark mode
 ```
 
 Then test memory updates:
 
 ```txt
-Actually, I prefer TypeScript more than Python now.
+Actually, I prefer light mode now.
 ```
 
 Expected:
 
-- A TypeScript preference is added or the old Python memory is updated/replaced.
+- The old dark-mode memory is updated or replaced with the new light-mode preference.
 
 ## API Smoke Tests
 
@@ -205,7 +219,7 @@ Invoke-RestMethod `
   -Uri http://localhost:4000/api/auth/signup `
   -Method POST `
   -ContentType "application/json" `
-  -Body '{"name":"Samiksha","email":"samiksha@example.com","password":"password123"}'
+  -Body '{"name":"Alex","email":"alex@example.com","password":"password123"}'
 ```
 
 Use the returned `access_token` as a Bearer token for chat:
@@ -260,7 +274,7 @@ bun run chat
 
 ## Production Checklist
 
-- Use a fresh Neon branch/database or clear development users, chat messages, and memories before a public launch.
+- Use a fresh Neon project/database with no copied development users, chat messages, or memories before a public launch.
 - Set `NODE_ENV="production"`, `WEB_ORIGIN` to the deployed frontend URL, and `VITE_API_URL` to the deployed API URL.
 - Set `CORS_ORIGINS` to the deployed frontend origin. Add multiple origins as a comma-separated list only when needed.
 - Set `TRUST_PROXY="1"` if the API runs behind a trusted reverse proxy/load balancer that terminates HTTPS.

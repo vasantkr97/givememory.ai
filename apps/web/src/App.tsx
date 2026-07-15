@@ -8,6 +8,7 @@ import LandingPage from "@/pages/LandingPage";
 import ProtectedLayout from "@/pages/ProtectedLayout";
 import SignInPage from "@/pages/SignInPage";
 import SignUpPage from "@/pages/SignUpPage";
+import SettingsPage from "@/pages/SettingsPage";
 
 function getPath() {
   return window.location.pathname;
@@ -42,6 +43,14 @@ function RouterView() {
     return (
       <ProtectedLayout>
         <DashboardPage />
+      </ProtectedLayout>
+    );
+  }
+
+  if (path === "/settings") {
+    return (
+      <ProtectedLayout>
+        <SettingsPage />
       </ProtectedLayout>
     );
   }

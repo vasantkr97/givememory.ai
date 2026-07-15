@@ -14,8 +14,12 @@ memoryRoutes.post(
   authenticate,
   asyncHandler(async (request, response) => {
     const input = addMemorySchema.parse(request.body);
-    if (!canAccessConversation(request.user!.id, input.conversationId)) {
-      response.status(403).json({ detail: "Conversation access denied" });
+    const conversation = await appServices.stores.conversationStore.findOwnedById(
+      request.user!.id,
+      input.conversationId
+    );
+    if (!conversation) {
+      response.status(404).json({ detail: "Conversation not found" });
       return;
     }
 
@@ -29,8 +33,12 @@ memoryRoutes.post(
   authenticate,
   asyncHandler(async (request, response) => {
     const input = searchMemorySchema.parse(request.body);
-    if (!canAccessConversation(request.user!.id, input.conversationId)) {
-      response.status(403).json({ detail: "Conversation access denied" });
+    const conversation = await appServices.stores.conversationStore.findOwnedById(
+      request.user!.id,
+      input.conversationId
+    );
+    if (!conversation) {
+      response.status(404).json({ detail: "Conversation not found" });
       return;
     }
 
@@ -52,7 +60,7 @@ memoryRoutes.patch(
     const existing = await prisma.memory.findFirst({
       where: {
         id: Number(request.params.id),
-        conversationId: request.user!.id
+        conversation: { userId: request.user!.id }
       }
     });
     if (!existing) {
@@ -69,12 +77,8 @@ memoriesRoutes.get(
   "/",
   authenticate,
   asyncHandler(async (request, response) => {
-    const conversationId = request.user!.id;
-    await prisma.conversation.upsert({
-      where: { id: conversationId },
-      create: { id: conversationId, userId: request.user!.id },
-      update: { userId: request.user!.id }
-    });
+    const conversation = await appServices.stores.conversationStore.getOrCreateForUser(request.user!.id);
+    const conversationId = conversation.id;
 
     const memories = await prisma.memory.findMany({
       where: { conversationId, isActive: true },
@@ -131,7 +135,8 @@ memoryRoutes.get(
   "/:id",
   authenticate,
   asyncHandler(async (request, response) => {
-    const conversationId = request.user!.id;
+    const conversation = await appServices.stores.conversationStore.getOrCreateForUser(request.user!.id);
+    const conversationId = conversation.id;
     const memoryId = Number(request.params.id);
     const memories = await prisma.memory.findMany({
       where: { conversationId, isActive: true },
@@ -179,7 +184,7 @@ memoryRoutes.delete(
     const memory = await prisma.memory.findFirst({
       where: {
         id: Number(request.params.id),
-        conversationId: request.user!.id
+        conversation: { userId: request.user!.id }
       }
     });
     if (!memory) {
@@ -197,10 +202,6 @@ memoryRoutes.delete(
 
 function buildIdMapping(memories: Array<{ id: number }>) {
   return Object.fromEntries(memories.map((memory, index) => [memory.id, index + 1])) as Record<number, number>;
-}
-
-function canAccessConversation(userId: number, conversationId: number) {
-  return userId === conversationId;
 }
 
 function getConnectionScore(memory: { metadata: unknown }, targetId: number) {

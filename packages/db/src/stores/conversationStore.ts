@@ -9,6 +9,35 @@ export class ConversationStore {
     });
   }
 
+  createForUser(userId: number) {
+    return this.db.conversation.create({
+      data: { userId }
+    });
+  }
+
+  getOrCreateForUser(userId: number) {
+    return this.db.conversation.upsert({
+      where: { userId },
+      create: { userId },
+      update: {}
+    });
+  }
+
+  findByUserId(userId: number) {
+    return this.db.conversation.findUnique({
+      where: { userId }
+    });
+  }
+
+  findOwnedById(userId: number, conversationId: number) {
+    return this.db.conversation.findFirst({
+      where: {
+        id: conversationId,
+        userId
+      }
+    });
+  }
+
   list() {
     return this.db.conversation.findMany({
       orderBy: { updatedAt: "desc" },

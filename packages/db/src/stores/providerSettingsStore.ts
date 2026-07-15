@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { decryptStoredSecret, encryptSecret } from "../secretCrypto";
 
 export type ProviderSettings = {
   llmProvider: "openai" | "openrouter";
@@ -39,8 +40,8 @@ export class ProviderSettingsStore {
 
     return {
       llmProvider: settings?.llmProvider ?? envProvider,
-      openaiApiKey: firstConfiguredValue(settings?.openaiApiKey, process.env.OPENAI_API_KEY),
-      openrouterApiKey: firstConfiguredValue(settings?.openrouterApiKey, process.env.OPENROUTER_API_KEY),
+      openaiApiKey: firstConfiguredValue(decryptStoredSecret(settings?.openaiApiKey), process.env.OPENAI_API_KEY),
+      openrouterApiKey: firstConfiguredValue(decryptStoredSecret(settings?.openrouterApiKey), process.env.OPENROUTER_API_KEY),
       llmModel: settings?.llmModel ?? process.env.LLM_MODEL ?? DEFAULT_SETTINGS.llmModel,
       embeddingModel: settings?.embeddingModel ?? process.env.EMBEDDING_MODEL ?? DEFAULT_SETTINGS.embeddingModel,
       debug: settings?.debug ?? process.env.DEBUG === "true"
@@ -52,8 +53,8 @@ export class ProviderSettingsStore {
       where: { id: 1 },
       update: {
         llmProvider: input.llmProvider,
-        openaiApiKey: input.openaiApiKey,
-        openrouterApiKey: input.openrouterApiKey,
+        openaiApiKey: encryptOptionalSecret(input.openaiApiKey),
+        openrouterApiKey: encryptOptionalSecret(input.openrouterApiKey),
         llmModel: input.llmModel,
         embeddingModel: input.embeddingModel,
         debug: input.debug
@@ -61,8 +62,8 @@ export class ProviderSettingsStore {
       create: {
         id: 1,
         llmProvider: input.llmProvider,
-        openaiApiKey: input.openaiApiKey,
-        openrouterApiKey: input.openrouterApiKey,
+        openaiApiKey: encryptOptionalSecret(input.openaiApiKey),
+        openrouterApiKey: encryptOptionalSecret(input.openrouterApiKey),
         llmModel: input.llmModel,
         embeddingModel: input.embeddingModel,
         debug: input.debug
@@ -71,8 +72,8 @@ export class ProviderSettingsStore {
 
     return {
       llmProvider: saved.llmProvider,
-      openaiApiKey: saved.openaiApiKey,
-      openrouterApiKey: saved.openrouterApiKey,
+      openaiApiKey: decryptStoredSecret(saved.openaiApiKey),
+      openrouterApiKey: decryptStoredSecret(saved.openrouterApiKey),
       llmModel: saved.llmModel,
       embeddingModel: saved.embeddingModel,
       debug: saved.debug
@@ -89,6 +90,10 @@ export class ProviderSettingsStore {
       debug: settings.debug
     };
   }
+}
+
+function encryptOptionalSecret(value: string | null) {
+  return value ? encryptSecret(value) : null;
 }
 
 function firstConfiguredValue(...values: Array<string | null | undefined>) {

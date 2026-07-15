@@ -77,7 +77,7 @@ export function ApiKeyModal({ onSuccess, onClose, canClose = false }: ApiKeyModa
           </div>
           <h2 className="text-xl font-semibold">Add Your OpenRouter API Key</h2>
           <p className="text-sm text-muted-foreground">
-            To use ContextMemory, you need an OpenRouter API key. Your key is encrypted
+            To use GiveMemory.ai, you need an OpenRouter API key. Your key is encrypted
             and stored securely.
           </p>
         </div>

@@ -1,4 +1,5 @@
-import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { decryptSecret, encryptSecret } from "@givememory/db";
 
 export const ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60;
 const REFRESH_TOKEN_EXPIRE_SECONDS = 60 * 60 * 24 * 7;
@@ -93,31 +94,10 @@ export function verifyPassword(password: string, storedHash: string) {
   return stored.byteLength === attempted.byteLength && timingSafeEqual(stored, attempted);
 }
 
-function encryptionKey() {
-  const secret = process.env.ENCRYPTION_KEY ?? process.env.JWT_SECRET_KEY;
-  if (!secret) {
-    throw new Error("ENCRYPTION_KEY or JWT_SECRET_KEY environment variable is required");
-  }
-  return createHash("sha256").update(secret).digest();
-}
-
 export function encryptApiKey(apiKey: string) {
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", encryptionKey(), iv);
-  const encrypted = Buffer.concat([cipher.update(apiKey, "utf8"), cipher.final()]);
-  const tag = cipher.getAuthTag();
-  return `${iv.toString("base64url")}.${tag.toString("base64url")}.${encrypted.toString("base64url")}`;
+  return encryptSecret(apiKey);
 }
 
 export function decryptApiKey(payload: string) {
-  const [ivText, tagText, encryptedText] = payload.split(".");
-  if (!ivText || !tagText || !encryptedText) {
-    throw new Error("Invalid encrypted API key");
-  }
-  const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), Buffer.from(ivText, "base64url"));
-  decipher.setAuthTag(Buffer.from(tagText, "base64url"));
-  return Buffer.concat([
-    decipher.update(Buffer.from(encryptedText, "base64url")),
-    decipher.final()
-  ]).toString("utf8");
+  return decryptSecret(payload);
 }

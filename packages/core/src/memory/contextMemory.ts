@@ -98,7 +98,7 @@ export class ContextMemory {
           }
 
           const connection = await this.memoryStore.findById(connectionId);
-          if (connection?.isActive) {
+          if (connection?.isActive && connection.conversationId === conversationId) {
             connected.push(connection);
             resultIds.add(connectionId);
           }

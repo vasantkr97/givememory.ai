@@ -44,6 +44,10 @@ settingsRoutes.put(
 );
 
 function normalizeApiKey(input: string | null | undefined, current: string | null): string | null {
+  if (input === null) {
+    return null;
+  }
+
   const trimmed = input?.trim();
 
   if (trimmed === undefined || trimmed === "") {

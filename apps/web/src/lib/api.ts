@@ -5,6 +5,8 @@ import type {
   ChatHistoryResponse,
   MemoriesResponse,
   MemoryDetail,
+  ProviderSettings,
+  ProviderSettingsUpdate,
   SignInRequest,
   SignUpRequest,
   TokenResponse,
@@ -16,7 +18,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 
-class ContextMemoryAPI {
+class GiveMemoryAPI {
   private getAccessToken() {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
@@ -178,6 +180,19 @@ class ContextMemoryAPI {
   deleteMemory(memoryId: number) {
     return this.request<{ status: string; id: number; deletedMemoryId: number }>(`/api/memory/${memoryId}`, { method: "DELETE" });
   }
+
+  async getProviderSettings() {
+    const response = await this.request<{ settings: ProviderSettings }>("/api/settings");
+    return response.settings;
+  }
+
+  async updateProviderSettings(input: ProviderSettingsUpdate) {
+    const response = await this.request<{ settings: ProviderSettings }>("/api/settings", {
+      method: "PUT",
+      body: JSON.stringify(input)
+    });
+    return response.settings;
+  }
 }
 
 function normalizeUser(user: User): User {
@@ -191,4 +206,4 @@ function normalizeUser(user: User): User {
   };
 }
 
-export const api = new ContextMemoryAPI();
+export const api = new GiveMemoryAPI();

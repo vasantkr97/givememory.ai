@@ -12,7 +12,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 45,
       local_id: 1,
-      text: "User's name is Samiksha",
+      text: "User's name is Alex",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:01:50.686960+00:00",

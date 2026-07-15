@@ -25,12 +25,12 @@ export default function ProtectedLayout({
 
   // Only show API key modal when free trial is expired and user has no key
   useEffect(() => {
-    if (isAuthenticated && needsApiKey) {
+    if (isAuthenticated && needsApiKey && pathname === "/dashboard") {
       setShowApiKeyModal(true);
     } else {
       setShowApiKeyModal(false);
     }
-  }, [isAuthenticated, needsApiKey]);
+  }, [isAuthenticated, needsApiKey, pathname]);
 
   const handleApiKeySuccess = async () => {
     await refreshApiKeyStatus();

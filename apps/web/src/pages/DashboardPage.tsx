@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen, LogOut, Key, ChevronDown, Home } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen, LogOut, Key, ChevronDown, Home, Settings } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
@@ -129,6 +129,16 @@ export default function DashboardPage() {
                   <Key className="w-4 h-4" />
                   Manage API Key
                 </button>
+                {user?.is_admin && (
+                  <Link
+                    href="/settings"
+                    className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted/50 transition-colors"
+                    onClick={() => setShowProfileDropdown(false)}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Provider Settings
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-500 hover:bg-muted/50 transition-colors"

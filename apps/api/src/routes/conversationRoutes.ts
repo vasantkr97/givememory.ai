@@ -32,16 +32,12 @@ conversationRoutes.post(
   "/",
   asyncHandler(async (request, response) => {
     const input = createConversationSchema.parse(request.body);
-    if (input.id !== undefined && input.id !== request.user!.id) {
+    const conversation = await appServices.stores.conversationStore.getOrCreateForUser(request.user!.id);
+
+    if (input.id !== undefined && input.id !== conversation.id) {
       response.status(403).json({ detail: "Conversation access denied" });
       return;
     }
-
-    const conversation = await prisma.conversation.upsert({
-      where: { id: request.user!.id },
-      create: { id: request.user!.id, userId: request.user!.id },
-      update: { userId: request.user!.id }
-    });
     response.status(201).json({ conversation });
   })
 );
@@ -50,12 +46,7 @@ conversationRoutes.get(
   "/:id",
   asyncHandler(async (request, response) => {
     const conversationId = Number(request.params.id);
-    if (conversationId !== request.user!.id) {
-      response.status(403).json({ detail: "Conversation access denied" });
-      return;
-    }
-
-    const conversation = await appServices.stores.conversationStore.findById(conversationId);
+    const conversation = await appServices.stores.conversationStore.findOwnedById(request.user!.id, conversationId);
     if (!conversation) {
       response.status(404).json({ error: "NotFound", message: "Conversation not found" });
       return;
@@ -69,8 +60,9 @@ conversationRoutes.get(
   "/:id/messages",
   asyncHandler(async (request, response) => {
     const conversationId = Number(request.params.id);
-    if (conversationId !== request.user!.id) {
-      response.status(403).json({ detail: "Conversation access denied" });
+    const conversation = await appServices.stores.conversationStore.findOwnedById(request.user!.id, conversationId);
+    if (!conversation) {
+      response.status(404).json({ detail: "Conversation not found" });
       return;
     }
 
@@ -83,8 +75,9 @@ conversationRoutes.get(
   "/:id/memories",
   asyncHandler(async (request, response) => {
     const conversationId = Number(request.params.id);
-    if (conversationId !== request.user!.id) {
-      response.status(403).json({ detail: "Conversation access denied" });
+    const conversation = await appServices.stores.conversationStore.findOwnedById(request.user!.id, conversationId);
+    if (!conversation) {
+      response.status(404).json({ detail: "Conversation not found" });
       return;
     }
 
