@@ -1,5 +1,4 @@
 export * from "./chat/chatService";
-export * from "./compat";
 export * from "./embeddings/embedText";
 export * from "./factory";
 export * from "./llm/json";

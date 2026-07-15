@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "clean": "bun -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
+    "build": "bun run clean && bun ../../node_modules/typescript/bin/tsc -p tsconfig.build.json",
     "typecheck": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "openai": "^4.77.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "typescript": "^5.7.3"
   }
 }

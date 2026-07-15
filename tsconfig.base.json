@@ -9,12 +9,10 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noEmitOnError": true,
-    "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
     "paths": {
-      "@givememory/shared": ["packages/shared/src/index.ts"],
-      "@givememory/db": ["packages/db/src/index.ts"],
-      "@givememory/core": ["packages/core/src/index.ts"]
+      "@givememory/shared": ["./packages/shared/src/index.ts"],
+      "@givememory/db": ["./packages/db/src/index.ts"],
+      "@givememory/core": ["./packages/core/src/index.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

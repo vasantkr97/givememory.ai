@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "main": "dist/apps/api/src/server.js",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "bun --watch src/server.ts",
     "clean": "bun -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
-    "build": "bun run clean && bun ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "build": "bun run clean && bun ../../node_modules/typescript/bin/tsc -p tsconfig.build.json",
     "typecheck": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
-    "start": "bun dist/apps/api/src/server.js"
+    "start": "bun dist/server.js"
   },
   "dependencies": {
     "@givememory/core": "workspace:*",

@@ -1,0 +1,222 @@
+@import "./styles/prism-vscode.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Pickle OS warm, minimal aesthetic */
+    --background: 40 15% 98%;        /* Warm off-white #FAFAF8 */
+    --foreground: 0 0% 11%;          /* Dark gray/black #1C1C1C */
+    --card: 40 20% 99%;              /* Slightly warmer white */
+    --card-foreground: 0 0% 11%;
+    --popover: 40 20% 99%;
+    --popover-foreground: 0 0% 11%;
+    --primary: 0 0% 11%;             /* Dark text */
+    --primary-foreground: 40 15% 98%;
+    --secondary: 40 10% 96%;         /* Subtle gray */
+    --secondary-foreground: 0 0% 11%;
+    --muted: 40 10% 95%;             /* Light gray with warmth */
+    --muted-foreground: 0 0% 42%;    /* Medium gray #6B6B6B */
+    --accent: 36 100% 70%;           /* Warm accent (amber) */
+    --accent-foreground: 0 0% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 40 8% 92%;             /* Subtle warm border */
+    --input: 40 8% 94%;
+    --ring: 36 100% 70%;             /* Warm focus ring */
+    --radius: 12px;                  /* Larger, softer radius */
+
+    /* Custom Pickle OS-inspired colors */
+    --bubble-blue: 214 100% 70%;
+    --bubble-amber: 36 100% 70%;
+    --bubble-active: 142 76% 36%;
+    --bubble-warm: 45 93% 47%;
+    --bubble-cold: 217 91% 60%;
+    --connection-opacity: 0.15;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Memory bubble styles */
+.memory-bubble {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.memory-bubble circle {
+  transition: filter 0.2s ease, stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease;
+}
+
+.memory-bubble:hover circle {
+  filter: brightness(1.1);
+}
+
+.memory-bubble.selected circle,
+.memory-bubble circle.selected {
+  stroke: #333 !important;
+  stroke-width: 4px !important;
+  filter: brightness(1.15) drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
+}
+
+/* Connection lines */
+.connection-line {
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  stroke-linecap: round;
+}
+
+/* Connected bubble glow effect */
+.memory-bubble.connected circle {
+  stroke: #666 !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.25)) brightness(1.1);
+}
+
+/* Chat message animations */
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.message-enter {
+  animation: slide-in-bottom 0.3s ease-out;
+}
+
+/* Detail panel animation */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* Graph canvas - warm, clean background */
+.graph-canvas {
+  background-color: hsl(40 15% 98%);
+  /* Removed grid pattern for cleaner Pickle OS look */
+}
+
+/* Loading states */
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Landing page — grain overlay for texture/depth */
+.landing-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Landing page — headline gradient */
+.landing-gradient-text {
+  background: linear-gradient(135deg, #d97706 0%, #ea580c 50%, #c2410c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Landing page — code card subtle border glow */
+.landing-code-card {
+  position: relative;
+}
+.landing-code-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), transparent 50%, rgba(217, 119, 6, 0.08));
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Landing page — feature cards subtle lift */
+.landing-feature-card {
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.landing-feature-card:hover {
+  transform: translateY(-2px);
+}

@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {
+      "@givememory/shared": ["../shared/dist/index.d.ts"],
+      "@givememory/db": ["../db/dist/index.d.ts"]
+    }
+  }
+}
