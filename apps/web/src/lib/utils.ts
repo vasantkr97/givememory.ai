@@ -6,51 +6,49 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Calculate bubble radius based on importance score
- * Range: 20px (low importance) to 44px (high importance)
+ * Keep graph bubbles visually consistent; importance is shown in detail panels,
+ * not by changing node size.
  */
-export function getBubbleRadius(importance: number): number {
-  const minRadius = 20;
-  const maxRadius = 44;
-  const clampedImportance = Math.max(0, Math.min(1, importance));
-  return minRadius + clampedImportance * (maxRadius - minRadius);
+export function getBubbleRadius(_importance: number): number {
+  return 38;
 }
-/**
- * Get bubble color based on type and age
- * @param type - "semantic" or "bubble"
- * @param createdAt - creation date for age-based coloring
- * @param useConstantColor - if true, uses constant green for episodic bubbles (for demo/landing)
- */
+type BubblePalette = {
+  surface: string;
+  stroke: string;
+  text: string;
+};
+
+/** Returns the flower-inspired visual palette for a memory node. */
+function getBubblePalette(
+  type: "semantic" | "bubble",
+  _createdAt?: string,
+  _useConstantColor: boolean = false
+): BubblePalette {
+  if (type === "semantic") {
+    return { surface: "#82dd9a", stroke: "#43ac62", text: "#17331f" };
+  }
+
+  return { surface: "#7057c7", stroke: "#46358a", text: "#ffffff" };
+}
+
 export function getBubbleColor(
   type: "semantic" | "bubble",
   createdAt?: string,
   useConstantColor: boolean = false
 ): string {
-  if (type === "semantic") {
-    return "hsl(36, 100%, 70%)"; // Amber
-  }
+  return getBubblePalette(type, createdAt, useConstantColor).surface;
+}
 
-  // For demo/landing pages, use constant green (same as dashboard's active green)
-  if (useConstantColor) {
-    return "hsl(142, 76%, 36%)"; // Darker green - matches dashboard's recent bubbles
-  }
+export function getBubbleStrokeColor(
+  type: "semantic" | "bubble",
+  createdAt?: string,
+  useConstantColor: boolean = false
+): string {
+  return getBubblePalette(type, createdAt, useConstantColor).stroke;
+}
 
-  // For episodic bubbles, calculate age-based color
-  if (createdAt) {
-    const daysAgo = Math.floor(
-      (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    if (daysAgo <= 7) {
-      return "hsl(142, 76%, 36%)"; // Active green
-    } else if (daysAgo <= 30) {
-      return "hsl(45, 93%, 47%)"; // Warm yellow
-    } else {
-      return "hsl(217, 91%, 60%)"; // Cold blue
-    }
-  }
-
-  return "hsl(214, 100%, 70%)"; // Default blue
+export function getBubbleTextColor(type: "semantic" | "bubble"): string {
+  return getBubblePalette(type).text;
 }
 
 /**

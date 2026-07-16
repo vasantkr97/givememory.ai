@@ -1,5 +1,5 @@
 {
-  "name": "@givememory/web",
+  "name": "@recalllayer/web",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "bun ../../node_modules/vite/bin/vite.js preview"
   },
   "dependencies": {
-    "@givememory/shared": "workspace:*",
+    "@recalllayer/shared": "workspace:*",
     "@radix-ui/react-slot": "^1.1.1",
     "@vitejs/plugin-react": "^4.3.4",
     "class-variance-authority": "^0.7.1",

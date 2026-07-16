@@ -1,4 +1,4 @@
-import type { MemoryStore } from "@givememory/db";
+import type { MemoryStore } from "@recalllayer/db";
 import type { Memory } from "@prisma/client";
 import type { VectorStore } from "../vector/vectorStore";
 

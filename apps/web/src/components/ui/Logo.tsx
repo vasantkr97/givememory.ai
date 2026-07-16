@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 interface LogoProps {
@@ -8,34 +7,34 @@ interface LogoProps {
 
 export function Logo({ size = 48, showText = true }: LogoProps) {
   return (
-    <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity group">
-      {/* Logo Container - using mix-blend-mode to remove the light background */}
-      <div 
-        className="relative flex items-center justify-center"
-        style={{ 
-          width: size, 
-          height: size,
-        }}
+    <Link href="/" className="brand-mark group" aria-label="RecallLayer.ai home">
+      <span
+        className="brand-mark__image"
+        style={{ width: size, height: size }}
       >
-        {/* The logo with blend mode to remove background */}
-        <Image
-          src="/contextmemorylogo.png"
-          alt="GiveMemory.ai logo"
-          width={size}
-          height={size}
-          className="object-contain mix-blend-multiply dark:mix-blend-screen dark:invert"
-          style={{
-            filter: "contrast(1.1)",
-          }}
-          priority
-        />
-      </div>
+        <RecallLayerMark />
+      </span>
 
       {showText && (
-        <span className="text-xl font-semibold text-foreground tracking-tight group-hover:text-foreground/90 transition-colors">
-          GiveMemory.ai
+        <span className="brand-mark__name">
+          RecallLayer<span>.ai</span>
         </span>
       )}
     </Link>
+  );
+}
+
+function RecallLayerMark() {
+  return (
+    <svg
+      className="recall-mark"
+      viewBox="0 0 40 40"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle className="recall-mark__layer recall-mark__layer--back" cx="16" cy="16" r="10.75" />
+      <circle className="recall-mark__layer recall-mark__layer--front" cx="24" cy="24" r="10.75" />
+      <circle className="recall-mark__node" cx="26.5" cy="13.5" r="3.35" />
+    </svg>
   );
 }

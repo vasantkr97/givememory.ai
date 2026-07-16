@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { prisma } from "@givememory/db";
-import { addMemorySchema, searchMemorySchema, updateMemorySchema } from "@givememory/shared";
-import { getConnectionIds } from "@givememory/core";
+import { prisma } from "@recalllayer/db";
+import { addMemorySchema, searchMemorySchema, updateMemorySchema } from "@recalllayer/shared";
+import { getConnectionIds } from "@recalllayer/core";
 import { appServices } from "../services";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { authenticate } from "../auth/middleware";
@@ -79,6 +79,7 @@ memoriesRoutes.get(
   asyncHandler(async (request, response) => {
     const conversation = await appServices.stores.conversationStore.getOrCreateForUser(request.user!.id);
     const conversationId = conversation.id;
+    await appServices.services.contextMemory.pruneConflictingMemories(conversationId);
 
     const memories = await prisma.memory.findMany({
       where: { conversationId, isActive: true },
@@ -138,6 +139,8 @@ memoryRoutes.get(
     const conversation = await appServices.stores.conversationStore.getOrCreateForUser(request.user!.id);
     const conversationId = conversation.id;
     const memoryId = Number(request.params.id);
+    await appServices.services.contextMemory.pruneConflictingMemories(conversationId);
+
     const memories = await prisma.memory.findMany({
       where: { conversationId, isActive: true },
       orderBy: { createdAt: "asc" }

@@ -110,7 +110,7 @@ export function renderConnections(
   const newLinks = linkSelection.enter()
     .append("line")
     .attr("class", "connection-line")
-    .attr("stroke", "#555")
+    .attr("stroke", "#74817d")
     .attr("stroke-width", (d) => getConnectionThickness(d.strength) + 1)
     .attr("stroke-linecap", "round")
     .attr("stroke-opacity", 0)

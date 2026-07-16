@@ -3,14 +3,15 @@ import type {
   MemoryStore,
   MessageStore,
   SummaryStore
-} from "@givememory/db";
-import type { ChatMessage, MemorySearchResponse } from "@givememory/shared";
+} from "@recalllayer/db";
+import type { ChatMessage, MemorySearchResponse } from "@recalllayer/shared";
 import type { Memory } from "@prisma/client";
 import type { EmbeddingService } from "../embeddings/embedText";
 import type { VectorStore } from "../vector/vectorStore";
 import type { BubbleCreator } from "./bubbleCreator";
 import type { MemoryExtractor } from "./extractor";
 import { getConnectionIds } from "./types";
+import { findSupersededPreferenceMemories } from "./preferenceConflict";
 import type { UpdatePhase } from "./updatePhase";
 import type { SummaryGenerator } from "../summary/summaryGenerator";
 
@@ -54,7 +55,7 @@ export class ContextMemory {
     await this.messageStore.addPair(conversationId, userMessage.content, assistantMessage.content);
 
     if (extraction.semantic.length > 0) {
-      await this.updatePhase.process(extraction.semantic, conversationId);
+      await this.updatePhase.process(extraction.semantic, conversationId, userMessage.content);
     }
 
     if (extraction.bubbles.length > 0) {
@@ -71,6 +72,8 @@ export class ContextMemory {
   }
 
   async search(query: string, conversationId: number, limit = 10, includeConnections = true): Promise<MemorySearchResponse> {
+    await this.pruneConflictingMemories(conversationId);
+
     const queryEmbedding = await this.embeddingService.embedText(query || "stored user memories");
     const vectorResults = await this.vectorStore.search(conversationId, queryEmbedding, limit * 2);
 
@@ -78,7 +81,10 @@ export class ContextMemory {
       return { query, total: 0, results: [] };
     }
 
-    const memories = await this.memoryStore.findManyByIds(vectorResults.map((result) => result.memoryId));
+    const memories = await this.memoryStore.findManyByIds(
+      vectorResults.map((result) => result.memoryId),
+      conversationId
+    );
     const scoreById = new Map(vectorResults.map((result) => [result.memoryId, result.score]));
     const scored = memories.map((memory) => ({
       memory,
@@ -155,6 +161,17 @@ export class ContextMemory {
     await this.vectorStore.remove(memoryId);
 
     return { deletedMemoryId: memoryId };
+  }
+
+  async pruneConflictingMemories(conversationId: number) {
+    const activeMemories = await this.memoryStore.listByConversation(conversationId, { limit: 500 });
+    const staleMemories = findSupersededPreferenceMemories(activeMemories);
+
+    for (const memory of staleMemories) {
+      await this.memoryStore.softDelete(memory.id);
+    }
+
+    return { pruned: staleMemories.length };
   }
 
   private scoreMemory(memory: Memory, similarity: number) {

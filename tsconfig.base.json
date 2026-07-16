@@ -10,9 +10,9 @@
     "isolatedModules": true,
     "noEmitOnError": true,
     "paths": {
-      "@givememory/shared": ["./packages/shared/src/index.ts"],
-      "@givememory/db": ["./packages/db/src/index.ts"],
-      "@givememory/core": ["./packages/core/src/index.ts"]
+      "@recalllayer/shared": ["./packages/shared/src/index.ts"],
+      "@recalllayer/db": ["./packages/db/src/index.ts"],
+      "@recalllayer/core": ["./packages/core/src/index.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

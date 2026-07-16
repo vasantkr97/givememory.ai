@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
-import { toVectorLiteral } from "@givememory/db";
+import { toVectorLiteral } from "@recalllayer/db";
 
 export interface VectorResult {
   memoryId: number;

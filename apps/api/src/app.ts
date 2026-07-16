@@ -1,6 +1,6 @@
 import express from "express";
 import morgan from "morgan";
-import { prisma } from "@givememory/db";
+import { prisma } from "@recalllayer/db";
 import { getJsonBodyLimit, getRateLimitConfig, getTrustProxy, isProduction } from "./config/env";
 import { apiKeyRoutes } from "./routes/apiKeyRoutes";
 import { authRoutes } from "./routes/authRoutes";
@@ -27,7 +27,7 @@ export function createApp() {
   app.use(morgan(isProduction() ? "combined" : "dev"));
 
   app.get("/api/health", (_request, response) => {
-    response.json({ status: "ok", name: "givememory-api" });
+    response.json({ status: "ok", name: "recalllayer-api" });
   });
 
   app.get(

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { providerSettingsSchema } from "@givememory/shared";
+import { providerSettingsSchema } from "@recalllayer/shared";
 import { appServices } from "../services";
 import { authenticate, requireAdmin } from "../auth/middleware";
 import { asyncHandler } from "../middleware/asyncHandler";

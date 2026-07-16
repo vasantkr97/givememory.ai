@@ -15,6 +15,7 @@ Extract as semantic:
 - Skills, expertise, tools used regularly
 - Professional role, background, long-term goals
 - Dietary preferences, allergies, relationships
+- Preference changes or corrections, preserving words like "now", "from today", "instead", or "no longer" when they are needed to replace older memory
 
 Do not extract as semantic:
 - Temporary states or moods

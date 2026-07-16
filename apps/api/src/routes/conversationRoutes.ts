@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { prisma } from "@givememory/db";
-import { createConversationSchema } from "@givememory/shared";
+import { prisma } from "@recalllayer/db";
+import { createConversationSchema } from "@recalllayer/shared";
 import { appServices } from "../services";
 import { authenticate } from "../auth/middleware";
 import { asyncHandler } from "../middleware/asyncHandler";

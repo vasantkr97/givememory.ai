@@ -14,11 +14,11 @@ import type {
   ValidateApiKeyResponse
 } from "@/types/api";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+const API_URL = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 
-class GiveMemoryAPI {
+class RecallLayerAPI {
   private getAccessToken() {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
@@ -206,4 +206,4 @@ function normalizeUser(user: User): User {
   };
 }
 
-export const api = new GiveMemoryAPI();
+export const api = new RecallLayerAPI();

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { prisma } from "@givememory/db";
+import { prisma } from "@recalllayer/db";
 import { isAdminEmail } from "../config/env";
 import { decodeToken, decryptApiKey } from "./crypto";
 

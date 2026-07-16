@@ -1,4 +1,4 @@
-import type { MessageStore, SummaryStore } from "@givememory/db";
+import type { MessageStore, SummaryStore } from "@recalllayer/db";
 import type { LlmClient } from "../llm/llmClient";
 import { SUMMARY_GENERATOR_PROMPT } from "../prompts/summaryPrompt";
 

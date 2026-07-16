@@ -1,4 +1,4 @@
-import type { ProviderSettingsStore } from "@givememory/db";
+import type { ProviderSettingsStore } from "@recalllayer/db";
 import { AsyncLocalStorage } from "node:async_hooks";
 import OpenAI from "openai";
 
@@ -61,8 +61,8 @@ export class LlmClient {
         apiKey,
         baseURL: "https://openrouter.ai/api/v1",
         defaultHeaders: {
-          "HTTP-Referer": "https://givememory.local",
-          "X-Title": "givememory"
+          "HTTP-Referer": "https://recalllayer.ai",
+          "X-Title": "RecallLayer.ai"
         }
       });
     }

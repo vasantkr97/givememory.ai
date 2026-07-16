@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { prisma } from "@givememory/db";
-import { refreshTokenSchema, signInSchema, signUpSchema } from "@givememory/shared";
+import { prisma } from "@recalllayer/db";
+import { refreshTokenSchema, signInSchema, signUpSchema } from "@recalllayer/shared";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { appServices } from "../services";
 import { authenticate, getUserApiKey, toPublicUser } from "../auth/middleware";

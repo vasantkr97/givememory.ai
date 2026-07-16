@@ -2,6 +2,8 @@
 
 This file maps the original Python project into the new TypeScript implementation.
 
+The `src/givememory/...` entries below are immutable historical paths from the legacy Python repository. The active TypeScript product and package namespace are `RecallLayer.ai` and `@recalllayer/*`.
+
 No Python source is copied into `new_project`. The old Python code remains only in the original root project. The new project is implemented with Bun, TypeScript, Express, React, Prisma, PostgreSQL, and pgvector.
 
 ## Source Mapping

@@ -4,7 +4,7 @@ import {
   MessageStore,
   ProviderSettingsStore,
   SummaryStore
-} from "@givememory/db";
+} from "@recalllayer/db";
 import type { PrismaClient } from "@prisma/client";
 import { EmbeddingService } from "./embeddings/embedText";
 import { LlmClient } from "./llm/llmClient";
@@ -19,7 +19,7 @@ import { SummaryGenerator } from "./summary/summaryGenerator";
 import { PgVectorStore } from "./vector/vectorStore";
 import { ChatService } from "./chat/chatService";
 
-export function createGivememoryServices(db: PrismaClient) {
+export function createRecallLayerServices(db: PrismaClient) {
   const conversationStore = new ConversationStore(db);
   const messageStore = new MessageStore(db);
   const memoryStore = new MemoryStore(db);

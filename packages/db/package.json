@@ -1,5 +1,5 @@
 {
-  "name": "@givememory/db",
+  "name": "@recalllayer/db",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -20,7 +20,7 @@
     "studio": "bun ../../node_modules/prisma/build/index.js studio --schema prisma/schema.prisma"
   },
   "dependencies": {
-    "@givememory/shared": "workspace:*",
+    "@recalllayer/shared": "workspace:*",
     "@prisma/client": "6.19.3"
   },
   "devDependencies": {

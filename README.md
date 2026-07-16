@@ -1,6 +1,6 @@
-# givememory
+# RecallLayer.ai
 
-`givememory` is a TypeScript long-term memory system for AI conversations.
+`RecallLayer.ai` is a TypeScript persistence and retrieval layer for AI-agent memory.
 
 It extracts useful facts from chat, stores them in PostgreSQL with pgvector, retrieves relevant memories during future turns, and provides a React dashboard for testing conversations, memories, and provider settings.
 

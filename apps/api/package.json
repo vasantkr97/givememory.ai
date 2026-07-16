@@ -1,5 +1,5 @@
 {
-  "name": "@givememory/api",
+  "name": "@recalllayer/api",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -12,9 +12,9 @@
     "start": "bun dist/server.js"
   },
   "dependencies": {
-    "@givememory/core": "workspace:*",
-    "@givememory/db": "workspace:*",
-    "@givememory/shared": "workspace:*",
+    "@recalllayer/core": "workspace:*",
+    "@recalllayer/db": "workspace:*",
+    "@recalllayer/shared": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

@@ -1,6 +1,6 @@
-import { FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Save, Settings } from "lucide-react";
+import { AlertCircle, ArrowLeft, CheckCircle2, KeyRound, Loader2, Save, Settings, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
@@ -74,7 +74,7 @@ export default function SettingsPage() {
       });
       setSettings(updated);
       setForm((current) => ({ ...current, openaiApiKey: "", openrouterApiKey: "" }));
-      toast.success("Provider settings saved");
+      toast.success("Provider configuration saved");
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Unable to save settings";
       setError(message);
@@ -86,95 +86,84 @@ export default function SettingsPage() {
 
   if (!user?.is_admin) {
     return (
-      <PageShell>
-        <div className="mx-auto max-w-xl px-6 py-20 text-center">
-          <Settings className="mx-auto mb-4 h-8 w-8 text-muted-foreground" />
-          <h1 className="text-2xl font-semibold">Admin access required</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Add your account email to ADMIN_EMAILS on the API server to manage global providers.
-          </p>
-          <Link href="/dashboard" className="mt-6 inline-flex items-center gap-2 text-sm font-medium hover:underline">
-            <ArrowLeft className="h-4 w-4" /> Back to dashboard
-          </Link>
+      <SettingsShell>
+        <div className="settings-access">
+          <Settings size={27} />
+          <p className="section-kicker">Restricted control surface</p>
+          <h1>Administrator access required.</h1>
+          <p>Add your account email to <code>ADMIN_EMAILS</code> on the API server to manage global model providers.</p>
+          <Link href="/dashboard"><ArrowLeft size={15} /> Return to the observatory</Link>
         </div>
-      </PageShell>
+      </SettingsShell>
     );
   }
 
   return (
-    <PageShell>
-      <main className="mx-auto w-full max-w-3xl px-6 py-10">
-        <div className="mb-8">
-          <p className="text-sm text-muted-foreground">System configuration</p>
-          <h1 className="mt-1 text-3xl font-semibold">Provider Settings</h1>
-        </div>
+    <SettingsShell>
+      <main className="settings-page">
+        <header className="settings-page__intro">
+          <div>
+            <p className="section-kicker">System configuration</p>
+            <h1>Provider control.</h1>
+            <p>Configure the global language and embedding models used by the memory pipeline.</p>
+          </div>
+          <div className="settings-health"><CheckCircle2 size={16} /><span>Configuration store</span><strong>Connected</strong></div>
+        </header>
 
         {loading ? (
-          <div className="flex min-h-64 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>
+          <div className="settings-loading"><Loader2 className="animate-spin" size={24} /><span>Reading provider configuration</span></div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6 border-t border-border pt-6">
-            {error && <div className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+          <form onSubmit={handleSubmit} className="settings-form">
+            {error && <div className="form-error settings-form__error" role="alert"><AlertCircle size={16} /><span>{error}</span></div>}
 
-            <Field label="Provider" htmlFor="provider">
-              <select
-                id="provider"
-                value={form.llmProvider}
-                onChange={(event) => setForm((current) => ({ ...current, llmProvider: event.target.value as SettingsForm["llmProvider"] }))}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="openai">OpenAI</option>
-                <option value="openrouter">OpenRouter</option>
-              </select>
-            </Field>
+            <section className="settings-section">
+              <header><span>01</span><div><h2>Inference provider</h2><p>Select the API boundary used for chat completion requests.</p></div></header>
+              <div className="provider-segment" role="group" aria-label="Language model provider">
+                <ProviderOption label="OpenAI" detail="Direct model access" active={form.llmProvider === "openai"} onClick={() => setForm((current) => ({ ...current, llmProvider: "openai" }))} />
+                <ProviderOption label="OpenRouter" detail="Multi-provider routing" active={form.llmProvider === "openrouter"} onClick={() => setForm((current) => ({ ...current, llmProvider: "openrouter" }))} />
+              </div>
+            </section>
 
-            <Field label="LLM model" htmlFor="llm-model">
-              <Input id="llm-model" required value={form.llmModel} onChange={(event) => setForm((current) => ({ ...current, llmModel: event.target.value }))} />
-            </Field>
+            <section className="settings-section">
+              <header><span>02</span><div><h2>Model assignment</h2><p>Models are applied to all newly processed requests.</p></div></header>
+              <div className="settings-fields">
+                <Field label="Language model" htmlFor="llm-model"><Input id="llm-model" required value={form.llmModel} onChange={(event) => setForm((current) => ({ ...current, llmModel: event.target.value }))} /></Field>
+                <Field label="Embedding model" htmlFor="embedding-model"><Input id="embedding-model" required value={form.embeddingModel} onChange={(event) => setForm((current) => ({ ...current, embeddingModel: event.target.value }))} /></Field>
+              </div>
+            </section>
 
-            <Field label="Embedding model" htmlFor="embedding-model">
-              <Input id="embedding-model" required value={form.embeddingModel} onChange={(event) => setForm((current) => ({ ...current, embeddingModel: event.target.value }))} />
-            </Field>
+            <section className="settings-section">
+              <header><span>03</span><div><h2>System credentials</h2><p>Leave saved credentials blank to keep the current encrypted value.</p></div></header>
+              <div className="settings-fields">
+                <Field label="OpenAI API key" htmlFor="openai-key" saved={settings?.hasOpenaiApiKey}><Input id="openai-key" type="password" autoComplete="new-password" placeholder={settings?.hasOpenaiApiKey ? "Encrypted value retained" : "sk-..."} value={form.openaiApiKey} onChange={(event) => setForm((current) => ({ ...current, openaiApiKey: event.target.value }))} /></Field>
+                <Field label="OpenRouter API key" htmlFor="openrouter-key" saved={settings?.hasOpenrouterApiKey}><Input id="openrouter-key" type="password" autoComplete="new-password" placeholder={settings?.hasOpenrouterApiKey ? "Encrypted value retained" : "sk-or-v1-..."} value={form.openrouterApiKey} onChange={(event) => setForm((current) => ({ ...current, openrouterApiKey: event.target.value }))} /></Field>
+              </div>
+            </section>
 
-            <Field label={`OpenAI API key${settings?.hasOpenaiApiKey ? " (saved)" : ""}`} htmlFor="openai-key">
-              <Input id="openai-key" type="password" autoComplete="new-password" placeholder={settings?.hasOpenaiApiKey ? "Leave blank to keep the saved key" : "sk-..."} value={form.openaiApiKey} onChange={(event) => setForm((current) => ({ ...current, openaiApiKey: event.target.value }))} />
-            </Field>
+            <section className="settings-section settings-section--compact">
+              <header><span>04</span><div><h2>Diagnostic logging</h2><p>Enable verbose server logs while investigating provider behavior.</p></div></header>
+              <button type="button" role="switch" aria-checked={form.debug} className={`settings-toggle ${form.debug ? "is-on" : ""}`} onClick={() => setForm((current) => ({ ...current, debug: !current.debug }))}><span /><strong>{form.debug ? "Enabled" : "Disabled"}</strong></button>
+            </section>
 
-            <Field label={`OpenRouter API key${settings?.hasOpenrouterApiKey ? " (saved)" : ""}`} htmlFor="openrouter-key">
-              <Input id="openrouter-key" type="password" autoComplete="new-password" placeholder={settings?.hasOpenrouterApiKey ? "Leave blank to keep the saved key" : "sk-or-v1-..."} value={form.openrouterApiKey} onChange={(event) => setForm((current) => ({ ...current, openrouterApiKey: event.target.value }))} />
-            </Field>
-
-            <label className="flex items-center gap-3 text-sm">
-              <input type="checkbox" checked={form.debug} onChange={(event) => setForm((current) => ({ ...current, debug: event.target.checked }))} className="h-4 w-4 accent-amber-500" />
-              Enable debug logging
-            </label>
-
-            <Button type="submit" disabled={saving} className="w-full sm:w-auto">
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save settings
-            </Button>
+            <footer className="settings-form__actions">
+              <div><KeyRound size={15} /><span>Credentials are encrypted before storage.</span></div>
+              <Button type="submit" disabled={saving}>{saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Save configuration</Button>
+            </footer>
           </form>
         )}
       </main>
-    </PageShell>
+    </SettingsShell>
   );
 }
 
-function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
-  return <div className="space-y-2"><Label htmlFor={htmlFor}>{label}</Label>{children}</div>;
+function ProviderOption({ label, detail, active, onClick }: { label: string; detail: string; active: boolean; onClick: () => void }) {
+  return <button type="button" className={active ? "is-active" : ""} onClick={onClick}><span>{active ? <CheckCircle2 size={16} /> : <SlidersHorizontal size={16} />}</span><div><strong>{label}</strong><small>{detail}</small></div></button>;
 }
 
-function PageShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Logo size={30} />
-          <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Dashboard
-          </Link>
-        </div>
-      </header>
-      {children}
-    </div>
-  );
+function Field({ label, htmlFor, saved, children }: { label: string; htmlFor: string; saved?: boolean; children: React.ReactNode }) {
+  return <div className="field-stack settings-field"><div><Label htmlFor={htmlFor}>{label}</Label>{saved && <span>Saved</span>}</div>{children}</div>;
+}
+
+function SettingsShell({ children }: { children: React.ReactNode }) {
+  return <div className="settings-shell"><header><Logo size={29} /><Link href="/dashboard"><ArrowLeft size={15} /> Observatory</Link></header>{children}</div>;
 }

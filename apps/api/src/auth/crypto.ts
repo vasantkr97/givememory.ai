@@ -1,5 +1,5 @@
 import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
-import { decryptSecret, encryptSecret } from "@givememory/db";
+import { decryptSecret, encryptSecret } from "@recalllayer/db";
 
 export const ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60;
 const REFRESH_TOKEN_EXPIRE_SECONDS = 60 * 60 * 24 * 7;

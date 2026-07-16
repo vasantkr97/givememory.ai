@@ -11,12 +11,12 @@ dotenv.config({ path: findNearestEnvFile(process.cwd(), currentDirectory) ?? res
 
 validateServerEnvironment();
 
-const [{ prisma }, { createGivememoryServices }] = await Promise.all([
-  import("@givememory/db"),
-  import("@givememory/core")
+const [{ prisma }, { createRecallLayerServices }] = await Promise.all([
+  import("@recalllayer/db"),
+  import("@recalllayer/core")
 ]);
 
-const services = createGivememoryServices(prisma);
+const services = createRecallLayerServices(prisma);
 const terminal = createInterface({ input, output });
 
 async function main() {

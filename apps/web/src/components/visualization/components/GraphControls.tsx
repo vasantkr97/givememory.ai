@@ -1,6 +1,4 @@
-"use client";
-
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 
 interface GraphControlsProps {
   onZoomIn: () => void;
@@ -8,33 +6,16 @@ interface GraphControlsProps {
   onResetView: () => void;
 }
 
-/**
- * Zoom control buttons for the memory graph
- */
 export function GraphControls({ onZoomIn, onZoomOut, onResetView }: GraphControlsProps) {
   return (
-    <div className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg shadow-lg flex flex-col">
-      <button
-        onClick={onZoomIn}
-        className="p-2 hover:bg-muted transition-colors rounded-t-lg border-b border-border"
-        title="Zoom in"
-      >
-        <ZoomIn className="w-4 h-4 text-muted-foreground" />
-      </button>
-      <button
-        onClick={onZoomOut}
-        className="p-2 hover:bg-muted transition-colors border-b border-border"
-        title="Zoom out"
-      >
-        <ZoomOut className="w-4 h-4 text-muted-foreground" />
-      </button>
-      <button
-        onClick={onResetView}
-        className="p-2 hover:bg-muted transition-colors rounded-b-lg"
-        title="Reset view"
-      >
-        <RotateCcw className="w-4 h-4 text-muted-foreground" />
-      </button>
+    <div className="graph-controls" aria-label="Graph view controls">
+      <Control label="Zoom in" onClick={onZoomIn}><ZoomIn size={16} /></Control>
+      <Control label="Zoom out" onClick={onZoomOut}><ZoomOut size={16} /></Control>
+      <Control label="Reset graph view" onClick={onResetView}><RotateCcw size={16} /></Control>
     </div>
   );
+}
+
+function Control({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
+  return <button type="button" className="graph-controls__button" onClick={onClick} title={label} aria-label={label}>{children}</button>;
 }

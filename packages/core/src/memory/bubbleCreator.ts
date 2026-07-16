@@ -1,5 +1,5 @@
-import type { BubbleCandidate } from "@givememory/shared";
-import type { MemoryStore } from "@givememory/db";
+import type { BubbleCandidate } from "@recalllayer/shared";
+import type { MemoryStore } from "@recalllayer/db";
 import type { Memory } from "@prisma/client";
 import type { EmbeddingService } from "../embeddings/embedText";
 import type { ConnectionFinder } from "./connectionFinder";

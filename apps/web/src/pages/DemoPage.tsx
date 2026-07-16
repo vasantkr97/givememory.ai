@@ -1,72 +1,49 @@
-"use client";
-
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Logo } from "@/components/ui/Logo";
+import { ArrowRight, Braces, Focus, GitBranch } from "lucide-react";
+import { MarketingHeader } from "@/components/layout/MarketingHeader";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight } from "lucide-react";
-import { DEMO_DATA } from "@/lib/demo-data";
 import { useAuth } from "@/contexts/AuthContext";
+import { DEMO_DATA } from "@/lib/demo-data";
 
-// Dynamic import for the demo-specific graph component
 const DemoGraph = dynamic(
-  () => import("@/components/visualization/DemoGraph").then((mod) => mod.DemoGraph),
-  { ssr: false, loading: () => <div className="flex items-center justify-center h-full">
-    <div className="text-muted-foreground">Loading visualization...</div>
-  </div> }
+  () => import("@/components/visualization/DemoGraph").then((module) => module.DemoGraph),
+  { ssr: false, loading: () => <div className="workspace-loading"><span className="workspace-loading__scan" /><p>Loading demonstration field</p></div> }
 );
 
 export default function DemoPage() {
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
-      {/* Simplified Demo Navbar */}
-      <nav className="flex items-center justify-between h-14 px-6 border-b border-border/50 bg-card/50 backdrop-blur-sm flex-shrink-0">
-        {/* Left: Logo and Title */}
-        <div className="flex items-center gap-4">
-          <Logo size={28} showText={false} />
-          <div className="h-5 w-px bg-border/60" />
-          <h1 className="text-sm font-semibold text-foreground">Demo Mode</h1>
-        </div>
+    <div className="demo-shell">
+      <MarketingHeader active="demo" />
+      <main className="demo-workbench">
+        <aside className="demo-brief">
+          <div>
+            <p className="section-kicker">Live memory field</p>
+            <h1>Inspect how context connects.</h1>
+            <p>Select any node to reveal its stored content and relationships. This field uses a prepared conversation so you can inspect the system without creating an account.</p>
+          </div>
 
-        {/* Right: Create Your Own / Dashboard Button */}
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground hidden md:block">
-            Explore the memory visualization
-          </span>
-          <AuthActionButton />
-        </div>
-      </nav>
+          <div className="demo-brief__sequence" aria-label="Demonstration sequence">
+            <div><span>01</span><Braces size={15} /><p><strong>Fact extracted</strong>User prefers technical explanations</p></div>
+            <div><span>02</span><GitBranch size={15} /><p><strong>Relationship found</strong>Connected to current project context</p></div>
+            <div><span>03</span><Focus size={15} /><p><strong>Context recalled</strong>Selected for the next model response</p></div>
+          </div>
 
-      {/* Full-width Memory Graph with Static Data */}
-      <div className="flex-1 overflow-hidden w-full h-full">
-        <DemoGraph data={DEMO_DATA} />
-      </div>
+          <AuthAction />
+        </aside>
+        <section className="demo-canvas" aria-label="Interactive example memory graph"><DemoGraph data={DEMO_DATA} /></section>
+      </main>
     </div>
   );
 }
 
-function AuthActionButton() {
+function AuthAction() {
   const { isAuthenticated, isLoading } = useAuth();
-  
-  if (isLoading) return null;
-
-  if (isAuthenticated) {
-    return (
-      <Link href="/dashboard">
-        <Button size="sm">
-          Create Your Own
-          <ArrowRight className="w-4 h-4 ml-2" />
-        </Button>
-      </Link>
-    );
-  }
+  if (isLoading) return <div className="demo-brief__loading" />;
 
   return (
-    <Link href="/signup">
-      <Button size="sm">
-        Create Your Own
-        <ArrowRight className="w-4 h-4 ml-2" />
-      </Button>
-    </Link>
+    <Button asChild className="w-full">
+      <Link href={isAuthenticated ? "/dashboard" : "/signup"}>{isAuthenticated ? "Open your memory field" : "Create your memory space"}<ArrowRight size={16} /></Link>
+    </Button>
   );
 }

@@ -69,12 +69,12 @@ export function attachTooltipHandlers(
       .style("opacity", "0")
       .html(`
         <div style="font-weight: 600; margin-bottom: 8px; color: ${getBubbleColor(d.type, d.created_at, useConstantColor)}; font-size: 14px;">
-          Memory #${d.local_id} · ${d.type === "semantic" ? "Semantic Fact" : "Episodic Bubble"}
+          Memory #${d.local_id} &middot; ${d.type === "semantic" ? "Semantic Fact" : "Episodic Memory"}
         </div>
         <div style="color: #f0f0f0; line-height: 1.6;">${truncateText(d.text, 200)}</div>
         ${connectionCount > 0 ?
           `<div style="margin-top: 10px; font-size: 11px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-            🔗 ${connectionCount} connection${connectionCount !== 1 ? 's' : ''}
+            Connections: ${connectionCount}
           </div>` : ''
         }
       `);

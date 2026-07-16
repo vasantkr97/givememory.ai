@@ -1,5 +1,5 @@
 {
-  "name": "@givememory/core",
+  "name": "@recalllayer/core",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -17,8 +17,8 @@
     "typecheck": "bun ../../node_modules/typescript/bin/tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@givememory/db": "workspace:*",
-    "@givememory/shared": "workspace:*",
+    "@recalllayer/db": "workspace:*",
+    "@recalllayer/shared": "workspace:*",
     "@prisma/client": "6.19.3",
     "openai": "^4.77.0"
   },

@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import type { MemoryNode } from "@/types/memory";
-import { getBubbleColor, getBubbleRadius } from "@/lib/utils";
+import { getBubbleColor, getBubbleRadius, getBubbleStrokeColor, getBubbleTextColor } from "@/lib/utils";
 
 export interface NodePosition {
   x: number;
@@ -62,17 +62,30 @@ export function renderNodes(
     .attr("class", "memory-bubble")
     .attr("data-id", (d) => d.id)
     .attr("data-local-id", (d) => d.local_id)
+    .attr("data-node-stroke", (d) => getBubbleStrokeColor(d.type, d.created_at, useConstantColor))
     .style("cursor", "pointer")
     .style("pointer-events", "all");
 
-  // Add circle
+  // Add the functional node surface. Selection logic intentionally targets this circle.
   node
     .append("circle")
+    .attr("class", "memory-bubble__surface")
     .attr("r", (d) => d.radius!)
     .attr("fill", (d) => getBubbleColor(d.type, d.created_at, useConstantColor))
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 2)
-    .attr("stroke-opacity", 0.8);
+    .attr("stroke", (d) => getBubbleStrokeColor(d.type, d.created_at, useConstantColor))
+    .attr("stroke-width", 1.25)
+    .attr("stroke-opacity", 0.72);
+
+  // A quiet outer registration ring adds depth without changing the hit area.
+  node
+    .append("circle")
+    .attr("class", "memory-bubble__halo")
+    .attr("r", (d) => d.radius! + 5)
+    .attr("fill", "none")
+    .attr("stroke", (d) => getBubbleStrokeColor(d.type, d.created_at, useConstantColor))
+    .attr("stroke-width", 0.75)
+    .attr("stroke-opacity", 0.3)
+    .attr("pointer-events", "none");
 
   // Add text - showing LOCAL_ID (per-user sequential ID)
   node
@@ -84,8 +97,8 @@ export function renderNodes(
       const size = d.radius! / 2.5;
       return `${Math.max(12, Math.min(size, 24))}px`;
     })
-    .attr("font-weight", "700")
-    .attr("fill", "#fff")
+    .attr("font-weight", "600")
+    .attr("fill", (d) => getBubbleTextColor(d.type))
     .attr("pointer-events", "none")
     .style("user-select", "none");
 
@@ -111,24 +124,26 @@ export function updateNodeStates(
       const isSelected = d.id === selectedId;
       const isConnected = connectedNodeIds.has(d.id);
       const hasSelection = selectedId !== null;
+      const bubble = d3.select(this);
+      const defaultStroke = bubble.attr("data-node-stroke") || getBubbleStrokeColor(d.type, d.created_at);
 
       // Determine if this bubble should be dimmed
       const shouldDim = hasSelection && !isSelected && !isConnected;
 
-      d3.select(this)
-        .select("circle")
+      bubble
+        .select(".memory-bubble__surface")
         .classed("selected", isSelected)
         .classed("dimmed", shouldDim)
         .classed("connected", isConnected && !isSelected)
         .transition()
         .duration(300)
-        .attr("stroke", isSelected ? "#333" : (isConnected ? "#666" : "#fff"))
-        .attr("stroke-width", isSelected ? 4 : (isConnected ? 3 : 2))
-        .attr("stroke-opacity", isSelected || isConnected ? 1 : 0.8)
+        .attr("stroke", isSelected ? "#202521" : (isConnected ? "#60716d" : defaultStroke))
+        .attr("stroke-width", isSelected ? 3 : (isConnected ? 2 : 1.25))
+        .attr("stroke-opacity", isSelected || isConnected ? 1 : 0.72)
         .attr("opacity", shouldDim ? 0.4 : 1);
 
       // Also dim the text
-      d3.select(this)
+      bubble
         .select("text")
         .transition()
         .duration(300)

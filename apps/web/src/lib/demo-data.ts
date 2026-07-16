@@ -12,7 +12,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 45,
       local_id: 1,
-      text: "User's name is Alex",
+      text: "User's name is Maya",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:01:50.686960+00:00",
@@ -21,7 +21,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 46,
       local_id: 2,
-      text: "User lives in India",
+      text: "User recently moved to Bengaluru",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:02:14.119277+00:00",
@@ -30,7 +30,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 47,
       local_id: 3,
-      text: "User observes that there has been a sudden revolution of AI in India in recent years and is inspired by it",
+      text: "User dreams of opening a quiet neighborhood bookstore",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:03:07.708248+00:00",
@@ -39,7 +39,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 48,
       local_id: 4,
-      text: "User is actively developing AI skills and has been working on them for the last 5 months",
+      text: "User loves handwritten notes and rainy mornings",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:04:40.244305+00:00",
@@ -48,7 +48,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 49,
       local_id: 5,
-      text: "User is planning to learn classical Kathak dance",
+      text: "User plans to visit an empty corner shop this Saturday",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:05:34.695159+00:00",
@@ -57,7 +57,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 50,
       local_id: 6,
-      text: "User is planning to start learning dance from next week",
+      text: "User booked the shop viewing for Saturday morning",
       type: "bubble",
       importance: 0.6,
       created_at: "2026-01-24T10:05:35.357015+00:00",
@@ -66,7 +66,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 51,
       local_id: 7,
-      text: "User will commute 11 km to attend dance classes",
+      text: "User will bring her sister to the shop viewing",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T10:06:52.419501+00:00",
@@ -75,7 +75,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 52,
       local_id: 8,
-      text: "User is starting Kathak dance classes next week with 11 km commute",
+      text: "User is viewing the corner shop with her sister this Saturday",
       type: "bubble",
       importance: 0.6,
       created_at: "2026-01-24T10:06:53.162391+00:00",
@@ -88,7 +88,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 53,
       local_id: 9,
-      text: "User is starting Kathak dance classes next week",
+      text: "User discovered the shop has a sunlit reading room",
       type: "bubble",
       importance: 0.7,
       created_at: "2026-01-24T10:10:26.366197+00:00",
@@ -101,7 +101,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 54,
       local_id: 10,
-      text: "User is planning to commute 11 km to Kathak dance classes starting next week",
+      text: "User wants to turn the reading room into a children's story corner",
       type: "bubble",
       importance: 0.6,
       created_at: "2026-01-24T10:14:04.329209+00:00",
@@ -116,7 +116,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 55,
       local_id: 11,
-      text: "User is considering joining the evening batch for Kathak dance classes",
+      text: "User is collecting favorite childhood books for the opening shelf",
       type: "bubble",
       importance: 0.6,
       created_at: "2026-01-24T10:29:25.633630+00:00",
@@ -131,7 +131,7 @@ export const DEMO_DATA: MemoriesResponse = {
     {
       id: 58,
       local_id: 12,
-      text: "User loves and enjoys dancing",
+      text: "User wants the bookstore to feel warm and welcoming",
       type: "semantic",
       importance: 0.5,
       created_at: "2026-01-24T11:09:58.025235+00:00",

@@ -1,5 +1,5 @@
 import type { Memory } from "@prisma/client";
-import type { ToolAction, ToolDecision } from "@givememory/shared";
+import type { ToolAction, ToolDecision } from "@recalllayer/shared";
 import type { LlmClient } from "../llm/llmClient";
 import { parseJsonObject } from "../llm/json";
 import { TOOL_CLASSIFIER_SYSTEM_PROMPT } from "../prompts/toolClassifierPrompt";

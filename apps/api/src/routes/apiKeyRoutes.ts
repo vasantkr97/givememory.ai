@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { prisma } from "@givememory/db";
-import { apiKeySchema } from "@givememory/shared";
+import { prisma } from "@recalllayer/db";
+import { apiKeySchema } from "@recalllayer/shared";
 import { authenticate, getUserApiKey } from "../auth/middleware";
 import { encryptApiKey } from "../auth/crypto";
 import { asyncHandler } from "../middleware/asyncHandler";

@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { productChatSchema } from "@givememory/shared";
-import { prisma } from "@givememory/db";
-import { runWithLlmOverride } from "@givememory/core";
+import { productChatSchema } from "@recalllayer/shared";
+import { prisma } from "@recalllayer/db";
+import { runWithLlmOverride } from "@recalllayer/core";
 import { appServices } from "../services";
 import { asyncHandler } from "../middleware/asyncHandler";
 import { authenticate, getUserApiKey, requireApiKeyOrFreeTier, toPublicUser } from "../auth/middleware";
@@ -54,6 +54,7 @@ chatRoutes.post(
       };
     }
 
+    await appServices.services.contextMemory.pruneConflictingMemories(conversationId);
     const extracted = await buildExtractedMemoryResponse(conversationId, result.extracted);
     await prisma.chatMessage.create({
       data: {

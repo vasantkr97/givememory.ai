@@ -1,4 +1,4 @@
-import type { ExtractionResult } from "@givememory/shared";
+import type { ExtractionResult } from "@recalllayer/shared";
 import { EXTRACTION_SYSTEM_PROMPT } from "../prompts/extractionPrompt";
 import { parseJsonObject } from "../llm/json";
 import type { LlmClient } from "../llm/llmClient";

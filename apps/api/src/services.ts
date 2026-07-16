@@ -1,4 +1,4 @@
-import { createGivememoryServices } from "@givememory/core";
-import { prisma } from "@givememory/db";
+import { createRecallLayerServices } from "@recalllayer/core";
+import { prisma } from "@recalllayer/db";
 
-export const appServices = createGivememoryServices(prisma);
+export const appServices = createRecallLayerServices(prisma);

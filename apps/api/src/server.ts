@@ -13,18 +13,18 @@ async function startServer() {
   const [{ createApp }, { appServices }, { disconnectDatabase }] = await Promise.all([
     import("./app"),
     import("./services"),
-    import("@givememory/db")
+    import("@recalllayer/db")
   ]);
 
   await prepareVectorIndexes(appServices.services.vectorStore.ensureIndexes.bind(appServices.services.vectorStore));
 
   const port = getApiPort();
   const server = createApp().listen(port, () => {
-    console.log(`givememory API listening on http://localhost:${port}`);
+    console.log(`RecallLayer API listening on http://localhost:${port}`);
   });
 
   async function shutdown(signal: string) {
-    console.log(`Received ${signal}. Shutting down givememory API.`);
+    console.log(`Received ${signal}. Shutting down RecallLayer API.`);
     server.close(async () => {
       await disconnectDatabase();
       process.exit(0);

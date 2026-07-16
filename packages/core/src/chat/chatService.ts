@@ -1,4 +1,4 @@
-import type { ChatMessage } from "@givememory/shared";
+import type { ChatMessage } from "@recalllayer/shared";
 import type { ContextMemory } from "../memory/contextMemory";
 import type { LlmClient } from "../llm/llmClient";
 
@@ -20,7 +20,9 @@ export class ChatService {
 User Memories:
 ${memoriesText}
 
-Use memories when they are relevant. Do not mention memory mechanics unless asked.`
+Use memories when they are relevant. The current user message is the freshest source of truth.
+If the current message conflicts with a stored memory, follow the current message and treat the stored memory as stale.
+Do not mention memory mechanics unless asked.`
       },
       { role: "user", content: message }
     ]);

@@ -1,459 +1,198 @@
-"use client";
-
-import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { Logo } from "@/components/ui/Logo";
+import { ArrowRight, ArrowUpRight, Braces, Database, GitBranch, ScanSearch, ShieldCheck, Sparkles } from "lucide-react";
+import { MarketingHeader } from "@/components/layout/MarketingHeader";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { Brain, ArrowRight, ChevronDown, LogOut, Mail, BookOpen, LayoutDashboard, ArrowUpRight, Zap, GitBranch, Menu, X } from "lucide-react";
+import { ContextLens } from "@/components/visualization/ContextLens";
+import { LandingHeroGraph } from "@/components/visualization/LandingHeroGraph";
 import { DEMO_DATA } from "@/lib/demo-data";
 
-const LandingHeroGraph = dynamic(
-  () => import("@/components/visualization/LandingHeroGraph").then((mod) => mod.LandingHeroGraph),
-  { ssr: false, loading: () => <div className="w-full max-w-[560px] aspect-[24/19] bg-muted/20 animate-pulse shrink-0 rounded-2xl" /> }
-);
+const stages = [
+  {
+    number: "01",
+    label: "Observe",
+    title: "A conversation happens",
+    copy: "RecallLayer receives the same user and assistant messages your application already produces.",
+    icon: Braces
+  },
+  {
+    number: "02",
+    label: "Structure",
+    title: "Useful facts emerge",
+    copy: "The extraction pipeline separates durable semantic facts from time-bound episodic events.",
+    icon: Sparkles
+  },
+  {
+    number: "03",
+    label: "Recall",
+    title: "Meaning finds meaning",
+    copy: "pgvector ranks conversation-scoped memories and returns only the context relevant to the next turn.",
+    icon: ScanSearch
+  },
+  {
+    number: "04",
+    label: "Respond",
+    title: "The model continues",
+    copy: "Retrieved evidence joins the prompt, giving the agent continuity without replaying its entire history.",
+    icon: GitBranch
+  }
+];
 
 export default function LandingPage() {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [showProductsDropdown, setShowProductsDropdown] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const productsDropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const target = event.target as Node;
-      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
-        setShowProfileDropdown(false);
-      }
-      if (productsDropdownRef.current && !productsDropdownRef.current.contains(target)) {
-        setShowProductsDropdown(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const handleLogout = async () => {
-    await logout();
-    setShowProfileDropdown(false);
-    router.push("/");
-  };
-
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Subtle background elements for depth */}
-      <div className="landing-grain" />
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-amber-100/40 via-orange-50/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-amber-50/30 via-transparent to-transparent rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+    <div className="observatory-page landing-page">
+      <MarketingHeader active="home" />
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between relative">
-          <Logo size={32} />
-
-          <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-            <Link href="/" className="text-sm font-medium text-foreground hover:text-amber-600 transition-colors">
-              Home
-            </Link>
-            <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Docs
-            </Link>
-            <div ref={productsDropdownRef} className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowProfileDropdown(false);
-                  setShowProductsDropdown((v) => !v);
-                }}
-                aria-expanded={showProductsDropdown}
-                aria-haspopup="true"
-                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Products
-                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showProductsDropdown ? "rotate-180" : ""}`} />
-              </button>
-              {showProductsDropdown && (
-                <div
-                  className="absolute left-1/2 -translate-x-1/2 top-full mt-2 min-w-[220px] bg-card border border-border rounded-xl shadow-lg py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-200"
-                  role="menu"
-                >
-                  <Link
-                    href="/docs"
-                    role="menuitem"
-                    onClick={() => setShowProductsDropdown(false)}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted/50 transition-colors border-b border-border"
-                  >
-                    <BookOpen className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="flex flex-col gap-0.5">
-                      <span>Pip package</span>
-                      <span className="text-xs text-muted-foreground">Docs & API</span>
-                    </span>
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    role="menuitem"
-                    onClick={() => setShowProductsDropdown(false)}
-                    className="flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
-                  >
-                    <LayoutDashboard className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="flex flex-col gap-0.5">
-                      <span>Interactive dashboard</span>
-                      <span className="text-xs text-muted-foreground">Visualize memories</span>
-                    </span>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </nav>
-
-          {/* Desktop Auth Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            {isLoading ? null : isAuthenticated && user ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => {
-                    setShowProductsDropdown(false);
-                    setShowProfileDropdown((v) => !v);
-                  }}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-semibold">
-                    {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showProfileDropdown ? 'rotate-180' : ''}`} />
-                </button>
-
-                {showProfileDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-card border border-border rounded-xl shadow-lg py-2 z-50">
-                    <div className="px-4 py-3 border-b border-border">
-                      <p className="font-medium text-sm">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                    <Link
-                      href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-muted/50 transition-colors"
-                      onClick={() => setShowProfileDropdown(false)}
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                      Go to Dashboard
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-500 hover:bg-muted/50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <Link href="/signin">
-                  <Button variant="ghost" className="text-sm">Sign In</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="text-sm rounded-full px-5">Sign Up</Button>
-                </Link>
-              </>
-            )}
+      <main>
+        <section className="landing-hero" aria-labelledby="landing-title">
+          <div className="landing-hero__lens" aria-label="Interactive memory context visualization">
+            <ContextLens>
+              <LandingHeroGraph data={DEMO_DATA} />
+            </ContextLens>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="md:hidden p-2 hover:bg-muted/50 rounded-lg transition-colors"
-            aria-label="Toggle menu"
-          >
-            {showMobileMenu ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {showMobileMenu && (
-          <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-md">
-            <div className="container mx-auto px-4 py-4 space-y-3">
-              <Link
-                href="/"
-                onClick={() => setShowMobileMenu(false)}
-                className="block py-2 text-sm font-medium text-foreground"
-              >
-                Home
-              </Link>
-              <Link
-                href="/docs"
-                onClick={() => setShowMobileMenu(false)}
-                className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Docs
-              </Link>
-              <Link
-                href="/demo"
-                onClick={() => setShowMobileMenu(false)}
-                className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Live Demo
-              </Link>
-              <Link
-                href="/dashboard"
-                onClick={() => setShowMobileMenu(false)}
-                className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-              >
-                Dashboard
-              </Link>
-              <div className="pt-3 border-t border-border/40 flex gap-2">
-                {isAuthenticated && user ? (
-                  <>
-                    <span className="text-sm text-muted-foreground py-2">{user.name}</span>
-                    <button
-                      onClick={() => { handleLogout(); setShowMobileMenu(false); }}
-                      className="text-sm text-red-500 py-2 ml-auto"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/signin" onClick={() => setShowMobileMenu(false)}>
-                      <Button variant="ghost" size="sm">Sign In</Button>
-                    </Link>
-                    <Link href="/signup" onClick={() => setShowMobileMenu(false)}>
-                      <Button size="sm" className="rounded-full">Sign Up</Button>
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Hero Section */}
-      <main className="relative">
-        <section className="mx-auto w-full max-w-[1480px] px-6 sm:px-8 lg:px-12 xl:px-16 pt-12 pb-12 md:pt-28 md:pb-24">
-          <div className="grid gap-10 md:grid-cols-[minmax(0,560px)_minmax(520px,620px)] md:items-center md:justify-center lg:gap-14 xl:gap-16">
-            {/* Left — text content */}
-            <div className="max-w-xl space-y-6 md:space-y-8">
-              {/* Simple beta indicator */}
-              <span className="inline-flex items-center gap-2 text-xs text-muted-foreground font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                Public beta
-              </span>
-
-              <div className="space-y-4 md:space-y-5">
-                <h1 className="text-[2rem] sm:text-[2.5rem] md:text-[3.5rem] font-bold tracking-tight text-foreground leading-[1.1]">
-                  Give Your AI Agents
-                  <br />
-                  <span className="landing-gradient-text">Context + Memory</span>
-                </h1>
-                <p className="text-base md:text-xl text-muted-foreground leading-relaxed max-w-md">
-                  Give your agents persistent context that grows, connects, and evolves with every conversation.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-1">
-                <Link href="/dashboard">
-                  <Button size="lg" className="w-full sm:w-auto rounded-full bg-foreground text-background hover:bg-foreground/90 px-6 md:px-7 h-11 md:h-12 text-sm font-semibold shadow-lg shadow-foreground/10">
-                    Start building
-                    <ArrowRight className="w-4 h-4 ml-1.5" />
-                  </Button>
-                </Link>
-                <Link href="/demo">
-                  <Button size="lg" variant="ghost" className="w-full sm:w-auto rounded-full h-11 md:h-12 text-sm font-semibold text-muted-foreground hover:text-foreground px-6 md:px-7 border border-border hover:border-border/80 hover:bg-muted/30">
-                    Live demo
-                    <ArrowUpRight className="w-4 h-4 ml-1.5" />
-                  </Button>
-                </Link>
-              </div>
-
-              {/* Quick proof points */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-xs md:text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-green-500" />
-                  Multi-Provider
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-green-500" />
-                  Bun + TypeScript
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1 h-1 rounded-full bg-green-500" />
-                  Self-hosted
-                </span>
-              </div>
-            </div>
-
-            {/* Right — graph visualization */}
-            <div className="hidden md:flex md:justify-center">
-              <div className="relative w-full max-w-[620px]">
-                {/* Soft glow behind graph */}
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-200/20 via-orange-100/10 to-transparent rounded-3xl blur-2xl scale-110 pointer-events-none" />
-                <div className="relative">
-                  <LandingHeroGraph data={DEMO_DATA} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile graph */}
-          <div className="mt-12 md:hidden flex justify-center">
-            <LandingHeroGraph data={DEMO_DATA} />
-          </div>
-        </section>
-
-        {/* How it works — inline code snippet */}
-        <section className="container mx-auto px-6 pb-20 md:pb-28">
-          <div className="landing-code-card rounded-2xl border border-border/60 bg-[#1C1C1C] p-6 md:p-8 max-w-2xl mx-auto shadow-2xl shadow-black/5">
-            <div className="flex items-center gap-2 mb-5">
-              <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-              <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-              <span className="w-3 h-3 rounded-full bg-[#28C840]" />
-              <span className="ml-3 text-xs text-white/30 font-mono">chat.ts</span>
-            </div>
-            <pre className="text-sm md:text-[0.8125rem] leading-relaxed font-mono overflow-x-auto">
-              <code>
-                <span className="text-[#c586c0]">const</span>
-                <span className="text-[#9cdcfe]"> apiUrl</span>
-                <span className="text-[#d4d4d4]"> = </span>
-                <span className="text-[#ce9178]">&quot;http://localhost:4000/api&quot;</span>
-                <span className="text-[#d4d4d4]">;</span>
-                {"\n\n"}
-                <span className="text-[#6a9955]">// Retrieve relevant memories and learn from this turn.</span>
-                {"\n"}
-                <span className="text-[#c586c0]">const</span>
-                <span className="text-[#9cdcfe]"> result</span>
-                <span className="text-[#d4d4d4]"> = </span>
-                <span className="text-[#c586c0]">await</span>
-                <span className="text-[#dcdcaa]"> fetch</span>
-                <span className="text-[#d4d4d4]">(apiUrl + </span>
-                <span className="text-[#ce9178]">&quot;/chat&quot;</span>
-                <span className="text-[#d4d4d4]">, {"{"}</span>
-                {"\n"}
-                <span className="text-[#d4d4d4]">  method: </span>
-                <span className="text-[#ce9178]">&quot;POST&quot;</span>
-                <span className="text-[#d4d4d4]">,</span>
-                {"\n"}
-                <span className="text-[#d4d4d4]">  headers: {"{"} Authorization: </span>
-                <span className="text-[#ce9178]">&quot;Bearer &quot;</span>
-                <span className="text-[#d4d4d4]"> + accessToken {"}"},</span>
-                {"\n"}
-                <span className="text-[#d4d4d4]">  body: JSON.</span>
-                <span className="text-[#dcdcaa]">stringify</span>
-                <span className="text-[#d4d4d4]">({"{"} message: </span>
-                <span className="text-[#ce9178]">&quot;I use TypeScript every day.&quot;</span>
-                <span className="text-[#d4d4d4]"> {"}"}),</span>
-                {"\n"}
-                <span className="text-[#d4d4d4]">{"}"});</span>
-                {"\n\n"}
-                <span className="text-[#c586c0]">const</span>
-                <span className="text-[#9cdcfe]"> data</span>
-                <span className="text-[#d4d4d4]"> = </span>
-                <span className="text-[#c586c0]">await</span>
-                <span className="text-[#9cdcfe]"> result</span>
-                <span className="text-[#d4d4d4]">.</span>
-                <span className="text-[#dcdcaa]">json</span>
-                <span className="text-[#d4d4d4]">();</span>
-              </code>
-            </pre>
-          </div>
-        </section>
-
-        {/* Features */}
-        <section className="container mx-auto px-6 pb-24 md:pb-32">
-          <div className="text-center max-w-lg mx-auto mb-14">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              Context, not just storage
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Your AI agents deserve memory that understands relationships between ideas, not a flat key-value store.
+          <div className="landing-hero__content">
+            <p className="section-kicker">Long-term memory infrastructure</p>
+            <h1 id="landing-title">RecallLayer<span>.ai</span></h1>
+            <p className="landing-hero__statement">
+              Your AI agent can finally remember what matters.
             </p>
+            <p className="landing-hero__copy">
+              Extract durable facts from conversation, retrieve them by meaning, and place the right evidence back into the model&apos;s working context.
+            </p>
+            <div className="landing-hero__actions">
+              <Button asChild size="lg"><Link href="/signup">Start building <ArrowRight size={17} /></Link></Button>
+              <Link href="/demo" className="landing-text-link">
+                Watch memory form <ArrowUpRight size={16} />
+              </Link>
+            </div>
+            <div className="landing-hero__assurance" aria-label="Platform qualities">
+              <span><Database size={14} /> PostgreSQL native</span>
+              <span><ShieldCheck size={14} /> Self-hostable</span>
+              <span><Braces size={14} /> TypeScript first</span>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5 max-w-4xl mx-auto">
-            <div className="group landing-feature-card p-6 rounded-2xl border border-border/60 bg-card hover:border-amber-500/25 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center mb-5 group-hover:bg-amber-500/15 transition-colors">
-                <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <circle cx="12" cy="12" r="3" />
-                  <circle cx="12" cy="5" r="2" />
-                  <circle cx="19" cy="12" r="2" />
-                  <circle cx="12" cy="19" r="2" />
-                  <circle cx="5" cy="12" r="2" />
-                  <line x1="12" y1="9" x2="12" y2="7" />
-                  <line x1="15" y1="12" x2="17" y2="12" />
-                  <line x1="12" y1="15" x2="12" y2="17" />
-                  <line x1="9" y1="12" x2="7" y2="12" />
-                </svg>
-              </div>
-              <h3 className="text-[0.9375rem] font-semibold text-foreground mb-2">Bubbles, not rows</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Memories live as semantic facts and episodic bubbles. They connect automatically — no graph database needed.
-              </p>
-            </div>
+          <div className="landing-hero__telemetry" aria-label="Retrieval trace example">
+            <div><span>Memory field</span><strong>12 facts</strong></div>
+            <div><span>Lens acquired</span><strong>3 memories</strong></div>
+            <div><span>Prompt payload</span><strong>468 tokens</strong></div>
+            <div><span>Context state</span><strong className="is-live">Ready</strong></div>
+          </div>
+        </section>
 
-            <div className="group landing-feature-card p-6 rounded-2xl border border-border/60 bg-card hover:border-green-500/25 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/5">
-              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mb-5 group-hover:bg-green-500/15 transition-colors">
-                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <h3 className="text-[0.9375rem] font-semibold text-foreground mb-2">Search by meaning</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                pgvector-powered semantic search finds related memories even when the words don&apos;t match. Fast, accurate, scalable.
-              </p>
-            </div>
+        <section className="landing-manifesto" aria-labelledby="manifesto-title">
+          <div>
+            <p className="section-kicker">The problem</p>
+            <h2 id="manifesto-title">Context windows forget. Memory systems recover.</h2>
+          </div>
+          <div className="landing-manifesto__copy">
+            <p>
+              Larger prompts are not durable memory. They are expensive snapshots. RecallLayer keeps an inspectable record outside the model, then selects what deserves attention now.
+            </p>
+            <p className="landing-manifesto__aside">Finite attention. Growing knowledge.</p>
+          </div>
+        </section>
 
-            <div className="group landing-feature-card p-6 rounded-2xl border border-border/60 bg-card hover:border-blue-500/25 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-5 group-hover:bg-blue-500/15 transition-colors">
-                <svg className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-[0.9375rem] font-semibold text-foreground mb-2">Works anywhere</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Bun and TypeScript from day one, with PostgreSQL + pgvector on Neon and OpenAI-compatible models through OpenRouter.
-              </p>
+        <section className="memory-pipeline" aria-labelledby="pipeline-title">
+          <header className="memory-pipeline__header">
+            <div>
+              <p className="section-kicker">One turn, end to end</p>
+              <h2 id="pipeline-title">A memory pipeline you can inspect</h2>
+            </div>
+            <p>Every stage maps to working product behavior, from message ingestion to vector-ranked recall.</p>
+          </header>
+
+          <div className="memory-pipeline__stages">
+            {stages.map(({ number, label, title, copy, icon: Icon }) => (
+              <article className="pipeline-stage" key={number}>
+                <div className="pipeline-stage__meta"><span>{number}</span><Icon size={17} /></div>
+                <p>{label}</p>
+                <h3>{title}</h3>
+                <div className="pipeline-stage__signal" aria-hidden="true"><span /></div>
+                <p className="pipeline-stage__copy">{copy}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="retrieval-proof" aria-labelledby="proof-title">
+          <div className="retrieval-proof__copy">
+            <p className="section-kicker">Retrieval trace</p>
+            <h2 id="proof-title">See why the model remembered.</h2>
+            <p>
+              RecallLayer exposes the selected facts, their relationships, and the resulting working set. No invisible personalization layer. No mystery state.
+            </p>
+            <Link href="/demo" className="landing-text-link landing-text-link--light">
+              Open the live observatory <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          <div className="retrieval-console" aria-label="Example retrieval output">
+            <div className="retrieval-console__topbar">
+              <span>retrieval.trace</span>
+              <span>143 ms</span>
+            </div>
+            <div className="retrieval-console__query">
+              <span>QUERY</span>
+              <p>“Which stack should I use for the deployment?”</p>
+            </div>
+            <div className="retrieval-console__results">
+              <TraceRow rank="01" score="0.94" type="SEMANTIC" text="User builds production services with TypeScript" />
+              <TraceRow rank="02" score="0.89" type="SEMANTIC" text="User deploys PostgreSQL workloads on Neon" />
+              <TraceRow rank="03" score="0.83" type="EPISODIC" text="Discussed a Bun and Express deployment" />
+            </div>
+            <div className="retrieval-console__footer">
+              <span>3 selected / 12 searched</span>
+              <strong>Context assembled</strong>
             </div>
           </div>
         </section>
 
+        <section className="architecture-strip" aria-label="Technology architecture">
+          <div className="architecture-strip__intro">
+            <p className="section-kicker">Production-shaped foundations</p>
+            <h2>Memory infrastructure built from parts you already trust.</h2>
+          </div>
+          <div className="architecture-strip__stack">
+            <StackItem value="Bun + Express" label="Typed API boundary" />
+            <StackItem value="PostgreSQL" label="Durable source of truth" />
+            <StackItem value="pgvector" label="Similarity retrieval" />
+            <StackItem value="OpenRouter" label="Model portability" />
+          </div>
+        </section>
 
+        <section className="landing-cta">
+          <div>
+            <p className="section-kicker">Give your agent continuity</p>
+            <h2>Build the next conversation on everything the agent has learned.</h2>
+          </div>
+          <div className="landing-cta__actions">
+            <Button asChild size="lg"><Link href="/signup">Create a memory space <ArrowRight size={17} /></Link></Button>
+            <Link href="/docs">Read the API docs</Link>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-background">
-        <div className="container mx-auto px-6 py-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <Logo size={24} />
-              <span className="text-sm text-muted-foreground">
-                AI memory, made visual.
-              </span>
-            </div>
-            <div className="flex items-center gap-6">
-              <a
-                href="https://x.com/vasantkr97"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="X (Twitter)"
-              >
-                <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
+      <footer className="landing-footer">
+        <div><span>RecallLayer.ai</span><p>Persistent context infrastructure for AI agents.</p></div>
+        <div><Link href="/docs">Docs</Link><Link href="/demo">Demo</Link><a href="https://github.com/vasantkr97/recalllayer.ai" target="_blank" rel="noreferrer">GitHub</a></div>
+        <span className="landing-footer__status"><i /> Public beta</span>
       </footer>
     </div>
   );
+}
+
+function TraceRow({ rank, score, type, text }: { rank: string; score: string; type: string; text: string }) {
+  return (
+    <div className="trace-row">
+      <span>{rank}</span>
+      <strong>{score}</strong>
+      <small>{type}</small>
+      <p>{text}</p>
+    </div>
+  );
+}
+
+function StackItem({ value, label }: { value: string; label: string }) {
+  return <div><strong>{value}</strong><span>{label}</span></div>;
 }

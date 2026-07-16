@@ -1,14 +1,12 @@
-"use client";
-
-import { useState, useRef, useEffect } from "react";
-import { Loader2, ArrowUp, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AlertCircle, ArrowUp, Braces, Database, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
-import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-import type { Message } from "@/types/memory";
-import type { ExtractedMemory } from "@/types/api";
+import { api } from "@/lib/api";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import type { ExtractedMemory } from "@/types/api";
+import type { Message } from "@/types/memory";
 
 interface ChatPanelProps {
   onMessageSent?: () => void;
@@ -21,261 +19,201 @@ export function ChatPanel({ onMessageSent, onNeedsApiKey }: ChatPanelProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Keep connection alive and auto-refresh memories
-  useSWR(
-    "/memories",
-    () => api.getMemories(),
-    { refreshInterval: 5000 }
-  );
+  useSWR("/memories", () => api.getMemories(), { refreshInterval: 5000 });
 
-  // Fetch chat history on component mount
   useEffect(() => {
-    const loadChatHistory = async () => {
+    async function loadChatHistory() {
       if (!user) {
         setIsLoadingHistory(false);
         return;
       }
 
       try {
+        setHistoryError(false);
         const history = await api.getChatHistory();
-        // Convert API messages to internal Message format
-        const loadedMessages: Message[] = history.messages.map((msg) => ({
-          role: msg.role,
-          content: msg.content,
-          timestamp: msg.created_at,
-          extractedMemories: msg.extracted_memories ? {
-            semantic: (msg.extracted_memories.semantic || []).map((m: ExtractedMemory) => ({
-              id: m.id,
-              local_id: m.local_id,
-              text: m.text,
-              type: m.type,
+        const loadedMessages: Message[] = history.messages.map((message) => ({
+          role: message.role,
+          content: message.content,
+          timestamp: message.created_at,
+          extractedMemories: message.extracted_memories ? {
+            semantic: (message.extracted_memories.semantic || []).map((memory: ExtractedMemory) => ({
+              id: memory.id,
+              local_id: memory.local_id,
+              text: memory.text,
+              type: memory.type
             })),
-            bubbles: (msg.extracted_memories.bubbles || []).map((m: ExtractedMemory) => ({
-              id: m.id,
-              local_id: m.local_id,
-              text: m.text,
-              type: m.type,
-            })),
-          } : undefined,
+            bubbles: (message.extracted_memories.bubbles || []).map((memory: ExtractedMemory) => ({
+              id: memory.id,
+              local_id: memory.local_id,
+              text: memory.text,
+              type: memory.type
+            }))
+          } : undefined
         }));
         setMessages(loadedMessages);
       } catch {
-        // Silent fail - just start with empty messages
+        setHistoryError(true);
       } finally {
         setIsLoadingHistory(false);
       }
-    };
+    }
 
-    loadChatHistory();
+    void loadChatHistory();
   }, [user]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async () => {
+  async function handleSend() {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
       role: "user",
       content: input.trim(),
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((current) => [...current, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
       const response = await api.chat(userMessage.content);
-
-      const assistantMessage: Message = {
+      setMessages((current) => [...current, {
         role: "assistant",
         content: response.response,
         timestamp: new Date().toISOString(),
-        extractedMemories: response.extracted_memories,
-      };
+        extractedMemories: response.extracted_memories
+      }]);
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      if (response.usage) updateUsageFromChat(response.usage);
 
-      // Update usage info from response
-      if (response.usage) {
-        updateUsageFromChat(response.usage);
-      }
-
-      // Show toast for extracted memories with IDs
       const { semantic, bubbles } = response.extracted_memories;
       if (semantic.length > 0 || bubbles.length > 0) {
-        const parts = [];
-        if (semantic.length > 0) {
-          const ids = semantic.map(m => `#${m.local_id}`).join(", ");
-          parts.push(`${semantic.length} fact${semantic.length !== 1 ? 's' : ''} (${ids})`);
-        }
-        if (bubbles.length > 0) {
-          const ids = bubbles.map(m => `#${m.local_id}`).join(", ");
-          parts.push(`${bubbles.length} bubble${bubbles.length !== 1 ? 's' : ''} (${ids})`);
-        }
-        toast.success(`Extracted: ${parts.join(", ")}`, { duration: 4000 });
+        const extracted = [
+          semantic.length ? `${semantic.length} semantic` : "",
+          bubbles.length ? `${bubbles.length} episodic` : ""
+        ].filter(Boolean).join(" · ");
+        toast.success(`Memory updated: ${extracted}`, { duration: 4000 });
       }
 
-      // Trigger immediate memory graph refresh using SWR mutate
-      mutate("/memories");
+      await mutate("/memories");
       onMessageSent?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to send message";
-
-      // Handle API key required error (free trial expired)
-      if (errorMessage === "API_KEY_REQUIRED") {
-        toast.error("Free trial ended. Please add your OpenRouter API key to continue.");
+      const message = error instanceof Error ? error.message : "Failed to send message";
+      if (message === "API_KEY_REQUIRED") {
+        toast.error("Your included messages are complete. Add an OpenRouter key to continue.");
         onNeedsApiKey?.();
       } else {
-        toast.error(errorMessage);
+        toast.error(message);
       }
-
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages((current) => current.slice(0, -1));
     } finally {
       setIsLoading(false);
       textareaRef.current?.focus();
     }
-  };
+  }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      void handleSend();
     }
-  };
+  }
 
   return (
-    <div className="flex flex-col h-full bg-card">
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-8 space-y-6">
+    <div className="chat-observatory">
+      <header className="chat-observatory__header">
+        <div>
+          <span className="chat-observatory__eyebrow">Conversation stream</span>
+          <h1>Working dialogue</h1>
+        </div>
+        <span className="chat-observatory__status"><i /> Recording context</span>
+      </header>
+
+      <div className="chat-observatory__messages" aria-live="polite">
         {isLoadingHistory ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mb-2" />
-            <div className="text-sm text-muted-foreground">Loading chat history...</div>
-          </div>
+          <ChatState icon={<Loader2 className="animate-spin" size={20} />} title="Loading the conversation" copy="Rebuilding the latest context stream." />
+        ) : historyError ? (
+          <ChatState icon={<AlertCircle size={20} />} title="Conversation unavailable" copy="The saved history could not be loaded. Refresh to try again." tone="error" />
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="text-sm text-muted-foreground max-w-sm">
-              Start a conversation to see your memory bubbles grow
+          <div className="chat-empty">
+            <div className="chat-empty__mark"><Database size={20} /></div>
+            <p className="section-kicker">No context recorded</p>
+            <h2>Tell the agent something worth remembering.</h2>
+            <p>Preferences, ongoing work, decisions, and events will appear in the memory field as the conversation develops.</p>
+            <div className="chat-empty__examples">
+              <span>“I deploy on Neon.”</span>
+              <span>“I prefer TypeScript.”</span>
             </div>
           </div>
-        ) : null}
-
-        {messages.length > 0 && (
+        ) : (
           <>
-            {messages.map((message, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  "flex flex-col message-enter",
-                  message.role === "user" ? "items-end" : "items-start"
-                )}
-              >
-                <div
-                  className={cn(
-                    "max-w-[85%] rounded-2xl px-4 py-3",
-                    message.role === "user"
-                      ? "bg-foreground text-background"
-                      : "bg-muted/70 text-foreground"
-                  )}
-                >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                    {message.content}
-                  </p>
+            {messages.map((message, index) => (
+              <article className={cn("chat-turn message-enter", message.role === "user" ? "chat-turn--user" : "chat-turn--assistant")} key={`${message.timestamp}-${index}`}>
+                <div className="chat-turn__meta">
+                  <span>{message.role === "user" ? "YOU" : "AGENT"}</span>
+                  <time>{message.timestamp ? formatRelativeTime(message.timestamp) : ""}</time>
                 </div>
-
-                {/* Timestamp */}
-                <span className="text-xs text-muted-foreground mt-1.5 px-1">
-                  {message.timestamp ? formatRelativeTime(message.timestamp) : ""}
-                </span>
-
-                {/* Memory extraction indicator */}
+                <div className="chat-turn__content"><p>{message.content}</p></div>
                 {message.role === "assistant" && message.extractedMemories && (
-                  <>
+                  <div className="chat-turn__extractions">
                     {message.extractedMemories.semantic.length > 0 && (
-                      <div className="flex items-center gap-1 mt-1 px-1 text-xs text-amber-600">
-                        <span>
-                          Fact{message.extractedMemories.semantic.length !== 1 ? 's' : ''}: {message.extractedMemories.semantic.map(m => `#${m.local_id}`).join(", ")}
-                        </span>
-                      </div>
+                      <span className="is-semantic"><Braces size={12} /> Semantic {message.extractedMemories.semantic.map((memory) => `#${memory.local_id}`).join(", ")}</span>
                     )}
                     {message.extractedMemories.bubbles.length > 0 && (
-                      <div className="flex items-center gap-1 mt-1 px-1 text-xs text-emerald-600">
-                        <span>
-                          Bubble{message.extractedMemories.bubbles.length !== 1 ? 's' : ''}: {message.extractedMemories.bubbles.map(m => `#${m.local_id}`).join(", ")}
-                        </span>
-                      </div>
+                      <span className="is-episodic"><Sparkles size={12} /> Episodic {message.extractedMemories.bubbles.map((memory) => `#${memory.local_id}`).join(", ")}</span>
                     )}
-                  </>
+                  </div>
                 )}
-              </div>
+              </article>
             ))}
 
             {isLoading && (
-              <div className="flex justify-start message-enter">
-                <div className="bg-muted/70 rounded-2xl px-4 py-3 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Thinking...</span>
-                </div>
-              </div>
+              <article className="chat-turn chat-turn--assistant message-enter">
+                <div className="chat-turn__meta"><span>AGENT</span><time>Now</time></div>
+                <div className="chat-turn__thinking"><span /><span /><span /> Retrieving and reasoning</div>
+              </article>
             )}
-
             <div ref={messagesEndRef} />
           </>
         )}
       </div>
 
-      {/* Minimal Input Area */}
-      <div className="px-6 py-5 border-t border-border/50">
-        {/* Free trial message counter */}
+      <footer className="chat-composer">
         {user && !user.usage.has_api_key && (
-          <div className="flex items-center justify-center gap-2 mb-3 text-xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span className="text-muted-foreground">
-              <span className="font-medium text-foreground">{user.usage.free_messages_remaining}</span>
-              /{user.usage.free_message_limit} free messages remaining
-            </span>
+          <div className="chat-composer__usage">
+            <span>Included usage</span>
+            <div><i style={{ width: `${(user.usage.free_messages_remaining / user.usage.free_message_limit) * 100}%` }} /></div>
+            <strong>{user.usage.free_messages_remaining}/{user.usage.free_message_limit}</strong>
           </div>
         )}
-
-        <div className="relative">
+        <div className="chat-composer__input">
           <textarea
             ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(event) => setInput(event.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Talk to your memory"
-            className="w-full resize-none rounded-xl border border-input bg-background/50 px-4 py-3 pr-20 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 focus-visible:border-accent min-h-[56px] max-h-[160px] transition-all"
+            placeholder="Add to the conversation..."
             disabled={isLoading}
             rows={1}
+            aria-label="Message"
           />
-
-          {/* Action Buttons - vertically centered */}
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <button
-              onClick={() => handleSend()}
-              disabled={!input.trim() || isLoading}
-              className="p-2 rounded-lg bg-foreground text-background hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
-              aria-label="Send message"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ArrowUp className="w-4 h-4" />
-              )}
-            </button>
-          </div>
+          <button type="button" onClick={() => void handleSend()} disabled={!input.trim() || isLoading} aria-label="Send message">
+            {isLoading ? <Loader2 size={17} className="animate-spin" /> : <ArrowUp size={17} />}
+          </button>
         </div>
-      </div>
+        <p>Enter to send · Shift + Enter for a new line</p>
+      </footer>
     </div>
   );
+}
+
+function ChatState({ icon, title, copy, tone }: { icon: React.ReactNode; title: string; copy: string; tone?: "error" }) {
+  return <div className={cn("chat-state", tone === "error" && "chat-state--error")}>{icon}<strong>{title}</strong><p>{copy}</p></div>;
 }

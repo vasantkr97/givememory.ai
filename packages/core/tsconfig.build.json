@@ -6,8 +6,8 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
-      "@givememory/shared": ["../shared/dist/index.d.ts"],
-      "@givememory/db": ["../db/dist/index.d.ts"]
+      "@recalllayer/shared": ["../shared/dist/index.d.ts"],
+      "@recalllayer/db": ["../db/dist/index.d.ts"]
     }
   }
 }

@@ -16,12 +16,13 @@ REPLACE:
 - Use when the candidate contradicts an existing memory.
 - memory_id must be the old memory ID.
 - text must contain the new fact to store.
+- Use REPLACE for changed preferences, corrections, or recency language such as "now", "from today", "instead", "today onwards", or "no longer".
 
 NOOP:
 - Use when the fact is already adequately captured or not worth storing.
 - memory_id and text must be null.
 
-Contradictions include opposite preferences, changed jobs, changed location, changed dietary state, or a direct negation of an existing memory.
+Contradictions include opposite preferences, changed jobs, changed location, changed dietary state, a direct negation of an existing memory, or a newer preference replacing an older preference in the same category.
 
 Return only valid JSON:
 {
