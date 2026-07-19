@@ -167,7 +167,8 @@ export default function LandingPage() {
             <h2>Build the next conversation on everything the agent has learned.</h2>
           </div>
           <div className="landing-cta__actions">
-            <Button asChild size="lg"><Link href="/signup">Create a memory space <ArrowRight size={17} /></Link></Button>
+            <p>Connect your model, keep your data, and give every conversation a useful past.</p>
+            <Button asChild size="lg"><Link className="landing-cta__primary" href="/signup">Create a memory space <ArrowRight size={17} /></Link></Button>
             <Link href="/docs">Read the API docs</Link>
           </div>
         </section>
